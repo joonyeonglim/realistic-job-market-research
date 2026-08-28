@@ -59,7 +59,7 @@ for (const [name, schema] of Object.entries(schemas)) {
   if (process.argv.includes("--write")) {
     fs.mkdirSync(outputDir, { recursive: true });
     fs.writeFileSync(file, rendered);
-  } else if (!fs.existsSync(file) || fs.readFileSync(file, "utf8") !== rendered) {
+  } else if (!fs.existsSync(file) || fs.readFileSync(file, "utf8").replace(/\r\n/g, "\n") !== rendered) {
     console.error(`SCHEMA_DRIFT: ${name}`);
     drift = true;
   }
