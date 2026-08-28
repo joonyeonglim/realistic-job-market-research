@@ -281,7 +281,11 @@ npx skills add joonyeonglim/realistic-job-market-research \
   -g -a codex -a claude-code -y
 ```
 
-업데이트:
+업데이트는 활성 에이전트 세션을 종료한 뒤 일반 터미널에서 실행합니다.
+
+> 활성 Codex/Claude 세션 안에서 업데이트하면 `skills` CLI가 canonical 디렉터리를 교체하는 순간
+> `SKILL.md: No such file or directory` 경고가 한 번 발생할 수 있습니다. 에이전트 세션을 닫은 일반
+> 터미널에서 업데이트하고, 아래 검증 후 새 세션을 시작하세요.
 
 ```bash
 npx skills update -g realistic-job-market-research -y
@@ -291,7 +295,18 @@ npx skills update -g realistic-job-market-research -y
 
 ```bash
 npx skills ls -g --json
+test -r ~/.agents/skills/realistic-job-market-research/SKILL.md
+npx -y skills-ref validate \
+  ~/.agents/skills/realistic-job-market-research
 ```
+
+`No such file or directory`가 지속되면 활성 세션을 종료한 뒤 최초 설치 명령을 다시 실행하고 Codex를
+재시작합니다. 설치기의 비원자적 교체로 생긴 일시적 경고라면 반복 재설치하지 않습니다.
+
+## 현재 한계와 로드맵
+
+공개 안정판으로 부르기 전에 닫아야 할 수집·점수·개인정보·보안·배포 누락은
+[`AUDIT.md`](AUDIT.md)에 수치와 우선순위로 공개합니다.
 
 ## 사용 예시
 
