@@ -1,0 +1,4 @@
+interface:
+  display_name: "Realistic Job Market Research"
+  short_description: "Verify whether job openings are actually worth pursuing"
+  default_prompt: "Use $realistic-job-market-research to verify these openings against my actual profile and produce an evidence-backed shortlist."
