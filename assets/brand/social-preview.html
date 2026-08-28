@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Realistic Job Market Research</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { width: 100vw; height: 100vh; margin: 0; overflow: hidden; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+    .canvas { position: relative; width: 100vw; height: 100vh; overflow: hidden; background: #102a43; }
+    .background { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+    .veil { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(16,42,67,.99) 0%, rgba(16,42,67,.96) 39%, rgba(16,42,67,.74) 57%, rgba(16,42,67,.10) 83%, rgba(16,42,67,.04) 100%); }
+    .content { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 58px 64px 50px; color: #f8fbfd; }
+    .eyebrow { display: flex; align-items: center; gap: 13px; color: #83ddca; font-size: 16px; font-weight: 850; letter-spacing: .15em; }
+    .mark { display: grid; grid-template-columns: repeat(3, 8px); gap: 5px; }
+    .mark span { width: 8px; height: 8px; border-radius: 50%; background: #37b6a1; }
+    .mark span:nth-child(2) { background: #83ddca; }
+    .mark span:nth-child(3) { background: rgba(244,242,236,.82); }
+    h1 { max-width: 670px; margin: 24px 0 17px; font-size: 68px; line-height: .99; letter-spacing: -.055em; font-weight: 900; text-wrap: balance; }
+    .subtitle { max-width: 610px; margin: 0; color: #d9e4ec; font-size: 24px; line-height: 1.42; font-weight: 650; letter-spacing: -.02em; }
+    .chips { display: flex; gap: 12px; margin-top: 31px; }
+    .chip { padding: 10px 15px; border: 1px solid rgba(131,221,202,.45); border-radius: 999px; background: rgba(8,127,107,.18); color: #edf9f6; font-size: 15px; font-weight: 800; }
+    .chip:nth-child(2) { border-color: rgba(255,208,107,.42); background: rgba(138,93,0,.22); }
+    .chip:nth-child(3) { border-color: rgba(244,242,236,.28); background: rgba(244,242,236,.09); }
+    .footer { display: flex; align-items: center; gap: 12px; margin-top: auto; color: #aebfcb; font-size: 14px; font-weight: 700; letter-spacing: .025em; }
+    .footer i { display: block; width: 28px; height: 2px; background: #37b6a1; }
+  </style>
+</head>
+<body>
+  <main class="canvas" aria-label="Realistic Job Market Research social preview">
+    <img class="background" src="hero-background.png" alt="">
+    <div class="veil"></div>
+    <section class="content">
+      <div class="eyebrow"><span class="mark"><span></span><span></span><span></span></span>OPEN AGENT SKILL</div>
+      <h1>Realistic Job<br>Market Research</h1>
+      <p class="subtitle">채용공고 전수수집 · 근거 검증 · 현실적 지원 판단</p>
+      <div class="chips" aria-label="Key capabilities">
+        <span class="chip">29 sources</span>
+        <span class="chip">22 audit gates</span>
+        <span class="chip">Codex + Claude</span>
+      </div>
+      <div class="footer"><i></i>Lossless ledger · Exact JD matching · Personalized evidence</div>
+    </section>
+  </main>
+</body>
+</html>

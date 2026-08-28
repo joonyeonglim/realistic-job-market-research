@@ -8,6 +8,11 @@ import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
+const pngSize = file => {
+  const buffer = fs.readFileSync(file);
+  assert.equal(buffer.toString("ascii", 1, 4), "PNG");
+  return [buffer.readUInt32BE(16), buffer.readUInt32BE(20)];
+};
 const run = (command, args) => {
   const result = spawnSync(command, args, { cwd: root, encoding: "utf8" });
   if (result.status !== 0) throw new Error(`${command} ${args.join(" ")}\n${result.stdout}\n${result.stderr}`);
@@ -38,4 +43,9 @@ assert.equal(plan.sources.length, 29);
 assert.equal(plan.sources.filter(source => source.attempt_status === "planned").length, 29);
 assert.equal(profile.profile_version, "example-v1");
 assert.equal(targets.jobs.length, 1);
+assert.deepEqual(pngSize(path.join(root, "assets/social-preview.png")), [1200, 630]);
+assert.deepEqual(pngSize(path.join(root, "assets/github-social-preview.png")), [1280, 640]);
+assert.deepEqual(pngSize(path.join(root, "assets/workflow-overview.png")), [1600, 900]);
+assert.deepEqual(pngSize(path.join(root, "assets/brand/hero-background.png")), [1536, 1024]);
+assert.match(fs.readFileSync(path.join(root, "assets/workflow-overview.svg"), "utf8"), /viewBox="0 0 1600 900"/);
 console.log("PACKAGE_SELF_TEST_PASS");

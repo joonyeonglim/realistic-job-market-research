@@ -1,5 +1,7 @@
 # Realistic Job Market Research
 
+![Realistic Job Market Research — 29-source collection, 22 audit gates, Codex and Claude](assets/github-social-preview.png)
+
 공고를 많이 보여주는 스킬이 아니라, **선언한 공개 출처를 빠짐없이 시도하고 실제로 회수한 공고에서 지원 가치가 있는 소수 후보까지 근거로 좁히는 스킬**입니다.
 
 공개 채용 채널을 감사 가능한 원장으로 보존한 뒤, 정확한 JD·후보자 경력·법인 신원·최신 재무·통근 또는 근무정책·채용 피로도·보상을 함께 검증합니다. Codex와 Claude Code가 같은 `SKILL.md`, 수집기, 검증기를 사용합니다.
@@ -166,22 +168,21 @@
 
 ## 처리 흐름
 
-```mermaid
-flowchart LR
-    P[로컬 후보자 프로필] --> I[29-source 실행 계획]
-    T[공식 ATS 대상 목록] --> I
-    I --> R[출처별 immutable raw]
-    R --> M[manifest + 전체 원장]
-    M --> D[필터 대시보드]
-    M --> S[상세 JD shortlist 검증]
-    S --> C[법인 신원 + 재무]
-    S --> W[통근·근무정책·전형·보상]
-    C --> Q[PREPARE / CONDITIONAL / DROP]
-    W --> Q
-    Q --> O[PASS / HOLD / NO_GO]
-    D --> A[14 + 8 감사 게이트]
-    O --> A
-```
+![개인 프로필과 29개 출처가 immutable raw 원장, 상세 검증, 두 단계 판단과 감사 증거로 이어지는 흐름](assets/workflow-overview.svg)
+
+PNG가 필요한 문서·메신저에서는 [`assets/workflow-overview.png`](assets/workflow-overview.png)를 사용할 수 있습니다.
+
+## 이미지와 공유
+
+| 용도 | 파일 | 규격 |
+|---|---|---|
+| README hero·GitHub Social Preview | [`assets/github-social-preview.png`](assets/github-social-preview.png) | 1280×640 PNG |
+| 일반 OG·메신저 공유 | [`assets/social-preview.png`](assets/social-preview.png) | 1200×630 PNG |
+| 워크플로 문서·README | [`assets/workflow-overview.svg`](assets/workflow-overview.svg) | 1600×900 SVG |
+| 워크플로 슬라이드·메신저 공유 | [`assets/workflow-overview.png`](assets/workflow-overview.png) | 1600×900 PNG |
+| 원본 생성 일러스트 | [`assets/brand/hero-background.png`](assets/brand/hero-background.png) | 1536×1024 PNG |
+
+공유 카드의 정확한 문구와 레이아웃 원본은 [`assets/brand/social-preview.html`](assets/brand/social-preview.html), 이미지 생성 provenance와 프롬프트는 [`assets/brand/PROVENANCE.md`](assets/brand/PROVENANCE.md)에 보존합니다.
 
 ## 얻게 되는 산출물
 

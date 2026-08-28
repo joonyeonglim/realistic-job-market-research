@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Realistic Job Market Research workflow</title>
+  <desc id="desc">A personalized profile and 29 public sources become an immutable raw ledger, pass through job-description, company-identity, finance, commute, and hiring-process verification, and produce separate application and offer decisions with audit evidence.</desc>
+  <defs>
+    <linearGradient id="navy" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#102a43"/>
+      <stop offset="1" stop-color="#173e5d"/>
+    </linearGradient>
+    <linearGradient id="teal" x1="0" x2="1">
+      <stop offset="0" stop-color="#087f6b"/>
+      <stop offset="1" stop-color="#37b6a1"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#102a43" flood-opacity=".12"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6d8292"/>
+    </marker>
+    <style>
+      .sans { font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; }
+      .label { font-size: 19px; font-weight: 800; fill: #102a43; }
+      .body { font-size: 15px; font-weight: 600; fill: #66717b; }
+      .small { font-size: 13px; font-weight: 750; fill: #66717b; letter-spacing: .03em; }
+      .white { fill: #f8fbfd; }
+      .muted-white { fill: #c9d7e2; }
+      .connector { fill: none; stroke: #9aabb7; stroke-width: 3; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1600" height="900" fill="#f4f2ec"/>
+  <path d="M0 110 H1600 M0 790 H1600" stroke="#d8d4c9" stroke-width="1"/>
+  <g class="sans">
+    <text x="72" y="65" font-size="18" font-weight="850" letter-spacing=".14em" fill="#087f6b">EVIDENCE-FIRST WORKFLOW</text>
+    <text x="72" y="121" font-size="42" font-weight="900" letter-spacing="-.035em" fill="#102a43">시장 소음에서 근거 기반 shortlist까지</text>
+    <text x="72" y="156" font-size="18" font-weight="600" fill="#66717b">수집 범위와 실패를 숨기지 않고, 지원 준비와 입사 판단을 분리합니다.</text>
+
+    <g filter="url(#shadow)">
+      <rect x="72" y="220" width="250" height="112" rx="18" fill="#fffdf9" stroke="#d8d4c9"/>
+      <circle cx="111" cy="259" r="16" fill="#dff3ed"/><path d="M103 259h16M111 251v16" stroke="#087f6b" stroke-width="3" stroke-linecap="round"/>
+      <text x="140" y="257" class="label">개인 프로필 고정</text>
+      <text x="96" y="295" class="body">강점 · 공백 · 하드 필터</text>
+      <text x="96" y="317" class="body">통근 · 재무 · 전형 정책</text>
+
+      <rect x="72" y="356" width="250" height="112" rx="18" fill="#fffdf9" stroke="#d8d4c9"/>
+      <circle cx="111" cy="395" r="16" fill="#e9edf0"/><path d="M102 395h18M106 389h10M106 401h10" stroke="#102a43" stroke-width="2.5" stroke-linecap="round"/>
+      <text x="140" y="393" class="label">29개 출처 시도</text>
+      <text x="96" y="431" class="body">공개 포털 · 공식 ATS</text>
+      <text x="96" y="453" class="body">인증 출처 · 실패 증거</text>
+
+      <rect x="72" y="492" width="250" height="112" rx="18" fill="#fffdf9" stroke="#d8d4c9"/>
+      <circle cx="111" cy="531" r="16" fill="#fff0c7"/><path d="M103 531l6 6 11-13" fill="none" stroke="#8a5d00" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="140" y="529" class="label">공식 대상 동결</text>
+      <text x="96" y="567" class="body">URL · source ID · 시간</text>
+      <text x="96" y="589" class="body">profile SHA-256</text>
+    </g>
+
+    <path class="connector" d="M322 276 C370 276 374 365 418 365"/>
+    <path class="connector" d="M322 412 H418"/>
+    <path class="connector" d="M322 548 C370 548 374 459 418 459"/>
+
+    <g filter="url(#shadow)">
+      <rect x="420" y="255" width="330" height="360" rx="28" fill="url(#navy)"/>
+      <rect x="451" y="287" width="126" height="31" rx="15.5" fill="#087f6b"/>
+      <text x="514" y="308" text-anchor="middle" font-size="13" font-weight="850" class="white">LOSSLESS LEDGER</text>
+      <text x="452" y="367" font-size="32" font-weight="900" class="white">Immutable raw</text>
+      <text x="452" y="402" font-size="18" font-weight="650" class="muted-white">원장 행을 삭제하거나</text>
+      <text x="452" y="428" font-size="18" font-weight="650" class="muted-white">좋은 쪽으로 보정하지 않음</text>
+      <g transform="translate(452 466)">
+        <rect width="266" height="48" rx="12" fill="#fffdf9" fill-opacity=".10" stroke="#fffdf9" stroke-opacity=".16"/>
+        <circle cx="25" cy="24" r="7" fill="#37b6a1"/>
+        <text x="44" y="29" font-size="15" font-weight="750" class="white">source ID + fingerprint</text>
+        <rect y="62" width="266" height="48" rx="12" fill="#fffdf9" fill-opacity=".10" stroke="#fffdf9" stroke-opacity=".16"/>
+        <circle cx="25" cy="86" r="7" fill="#d7a84b"/>
+        <text x="44" y="91" font-size="15" font-weight="750" class="white">partial · blocked · failed</text>
+      </g>
+      <text x="452" y="591" class="small muted-white">RAW · MANIFEST · DASHBOARD</text>
+    </g>
+
+    <path class="connector" d="M750 435 H820"/>
+
+    <g filter="url(#shadow)">
+      <rect x="824" y="212" width="300" height="112" rx="18" fill="#fffdf9" stroke="#d8d4c9"/>
+      <rect x="846" y="234" width="8" height="68" rx="4" fill="#37b6a1"/>
+      <text x="876" y="255" class="label">정확한 JD 검증</text>
+      <text x="876" y="285" class="body">confirmed · transferable</text>
+      <text x="876" y="307" class="body">missing · unknown</text>
+
+      <rect x="824" y="348" width="300" height="112" rx="18" fill="#fffdf9" stroke="#d8d4c9"/>
+      <rect x="846" y="370" width="8" height="68" rx="4" fill="#d7a84b"/>
+      <text x="876" y="391" class="label">법인 신원 + 재무</text>
+      <text x="876" y="421" class="body">2-of-4 identity gate</text>
+      <text x="876" y="443" class="body">연도·출처·충돌 보존</text>
+
+      <rect x="824" y="484" width="300" height="112" rx="18" fill="#fffdf9" stroke="#d8d4c9"/>
+      <rect x="846" y="506" width="8" height="68" rx="4" fill="#a83232"/>
+      <text x="876" y="527" class="label">현실 비용 검증</text>
+      <text x="876" y="557" class="body">통근 · 근무정책 · 보상</text>
+      <text x="876" y="579" class="body">채용 피로도 F0–F3</text>
+    </g>
+
+    <path class="connector" d="M1124 268 C1180 268 1175 331 1218 331"/>
+    <path class="connector" d="M1124 404 H1218"/>
+    <path class="connector" d="M1124 540 C1180 540 1175 477 1218 477"/>
+
+    <g filter="url(#shadow)">
+      <rect x="1222" y="250" width="306" height="154" rx="24" fill="#dff3ed" stroke="#8bcbbc"/>
+      <text x="1252" y="290" class="small" fill="#087f6b">APPLICATION EFFORT</text>
+      <text x="1252" y="335" font-size="27" font-weight="900" fill="#075f52">PREPARE</text>
+      <text x="1252" y="366" class="body">CONDITIONAL · DROP</text>
+
+      <rect x="1222" y="426" width="306" height="154" rx="24" fill="#fff0c7" stroke="#e3c16a"/>
+      <text x="1252" y="466" class="small" fill="#8a5d00">EMPLOYER / OFFER</text>
+      <text x="1252" y="511" font-size="27" font-weight="900" fill="#765000">PASS / HOLD</text>
+      <text x="1252" y="542" class="body">NO_GO</text>
+    </g>
+
+    <g transform="translate(72 716)">
+      <rect width="1456" height="104" rx="22" fill="#fffdf9" stroke="#d8d4c9"/>
+      <rect x="22" y="22" width="176" height="60" rx="15" fill="url(#teal)"/>
+      <text x="110" y="48" text-anchor="middle" font-size="14" font-weight="850" class="white">AUDIT EVIDENCE</text>
+      <text x="110" y="69" text-anchor="middle" font-size="13" font-weight="700" class="white">PASS or honest HOLD</text>
+      <text x="232" y="50" font-size="23" font-weight="900" fill="#102a43">14 ledger gates + 8 dashboard gates</text>
+      <text x="232" y="76" font-size="15" font-weight="650" fill="#66717b">재빌드 identity · accounting · provenance · browser · mobile · console · budget</text>
+      <rect x="1190" y="31" width="232" height="42" rx="21" fill="#e9edf0"/>
+      <text x="1306" y="58" text-anchor="middle" font-size="15" font-weight="850" fill="#102a43">REPRODUCIBLE OUTPUT</text>
+    </g>
+  </g>
+</svg>
