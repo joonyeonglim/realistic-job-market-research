@@ -169,7 +169,7 @@ def sample() -> dict:
             "known_gaps": ["scale evidence unavailable"]
         },
         "scoring": {
-            "model_version": "2026-08-v1",
+            "model_version": "2026-08-v2",
             "match_weights": {"mandatory_requirements": 45, "task_ownership": 20, "production_delivery": 15, "preferred_requirements": 8, "level_scope": 8, "domain_onboarding": 4},
             "opportunity_weights": {"match_score": 45, "finance": 25, "location_work_policy": 12, "hiring_process": 8, "compensation_level": 10},
             "match_values": {"confirmed": 100, "transferable": 55, "missing": 0, "unknown": 0},

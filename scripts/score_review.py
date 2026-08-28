@@ -12,6 +12,14 @@ from pathlib import Path
 from validate_profile import validate as validate_profile
 from validate_review import sample_document, validate_document
 
+CAPS = {
+    "mandatory_missing_match": 59,
+    "mandatory_unknown_match": 74,
+    "hard_gate_opportunity": 0,
+    "mandatory_missing_opportunity": 49,
+    "ambiguous_status_opportunity": 59,
+}
+
 
 def mean_match(items: list[dict], values: dict[str, float]) -> float | None:
     if not items:
@@ -19,12 +27,30 @@ def mean_match(items: list[dict], values: dict[str, float]) -> float | None:
     return sum(values[item["match"]] for item in items) / len(items)
 
 
-def weighted_score(values: dict[str, float | None], weights: dict[str, float]) -> float:
+def weighted_calculation(values: dict[str, float | None], weights: dict[str, float]) -> tuple[float, dict]:
     applicable = [(key, value) for key, value in values.items() if value is not None]
     denominator = sum(weights[key] for key, _ in applicable)
     if denominator <= 0:
         raise ValueError("no applicable weighted components")
-    return sum(value * weights[key] for key, value in applicable) / denominator
+    numerator = sum(value * weights[key] for key, value in applicable)
+    return numerator / denominator, {
+        "formula": "sum(component_score * weight) / applicable_weight_sum",
+        "terms": {
+            key: {
+                "score": None if value is None else round(value, 4),
+                "weight": weights[key],
+                "product": None if value is None else round(value * weights[key], 4),
+            }
+            for key, value in values.items()
+        },
+        "numerator": round(numerator, 4),
+        "denominator": denominator,
+        "raw_score": round(numerator / denominator, 4),
+    }
+
+
+def weighted_score(values: dict[str, float | None], weights: dict[str, float]) -> float:
+    return weighted_calculation(values, weights)[0]
 
 
 def band(value: float, thresholds: list[tuple[float, str]]) -> str:
@@ -47,16 +73,26 @@ def score_role(role: dict, scoring: dict) -> dict:
         "level_scope": match_values[dimensions["level_scope"]["match"]],
         "domain_onboarding": match_values[dimensions["domain_onboarding"]["match"]],
     }
-    raw_match = weighted_score(match_components, scoring["match_weights"])
+    raw_match, match_calculation = weighted_calculation(match_components, scoring["match_weights"])
     must_states = [item["match"] for item in must]
     caps: list[str] = []
-    match_score = raw_match
-    if "missing" in must_states and match_score > 59:
-        match_score = 59
-        caps.append("mandatory_missing_match_cap_59")
-    elif "unknown" in must_states and match_score > 74:
-        match_score = 74
-        caps.append("mandatory_unknown_match_cap_74")
+    match_ceiling = None
+    match_cap_name = None
+    if "missing" in must_states:
+        match_ceiling = CAPS["mandatory_missing_match"]
+        match_cap_name = "mandatory_missing_match_cap_59"
+    elif "unknown" in must_states:
+        match_ceiling = CAPS["mandatory_unknown_match"]
+        match_cap_name = "mandatory_unknown_match_cap_74"
+    match_score = min(raw_match, match_ceiling) if match_ceiling is not None else raw_match
+    if match_ceiling is not None and raw_match > match_ceiling:
+        caps.append(match_cap_name)
+    match_calculation.update({
+        "active_ceiling": match_ceiling,
+        "ceiling_binding": match_ceiling is not None and raw_match > match_ceiling,
+        "final_score_unrounded": round(match_score, 4),
+        "display_score": round(match_score, 1),
+    })
 
     axis_values = scoring["axis_values"]
     opportunity_axes = {
@@ -66,33 +102,55 @@ def score_role(role: dict, scoring: dict) -> dict:
         "hiring_process": axis_values["hiring_process"][role["hiring_process"]["grade"]],
         "compensation_level": axis_values["compensation_level"][role["compensation"]["grade"]],
     }
-    opportunity_score = weighted_score(opportunity_axes, scoring["opportunity_weights"])
+    raw_opportunity, opportunity_calculation = weighted_calculation(opportunity_axes, scoring["opportunity_weights"])
     hard_exclusion = role["gates"]["hard_exclusion"]
     current_status = role["current_status"]
+    opportunity_ceiling = None
     if hard_exclusion or current_status == "closed":
-        opportunity_score = 0
+        opportunity_ceiling = CAPS["hard_gate_opportunity"]
         caps.append("hard_gate_opportunity_0")
-    elif "missing" in must_states and opportunity_score > 49:
-        opportunity_score = 49
-        caps.append("mandatory_missing_opportunity_cap_49")
-    elif current_status == "ambiguous" and opportunity_score > 59:
-        opportunity_score = 59
-        caps.append("ambiguous_status_opportunity_cap_59")
+    elif "missing" in must_states:
+        opportunity_ceiling = CAPS["mandatory_missing_opportunity"]
+        if raw_opportunity > opportunity_ceiling:
+            caps.append("mandatory_missing_opportunity_cap_49")
+    elif current_status == "ambiguous":
+        opportunity_ceiling = CAPS["ambiguous_status_opportunity"]
+        if raw_opportunity > opportunity_ceiling:
+            caps.append("ambiguous_status_opportunity_cap_59")
+    opportunity_score = min(raw_opportunity, opportunity_ceiling) if opportunity_ceiling is not None else raw_opportunity
+    opportunity_calculation.update({
+        "active_ceiling": opportunity_ceiling,
+        "ceiling_binding": opportunity_ceiling is not None and raw_opportunity > opportunity_ceiling,
+        "final_score_unrounded": round(opportunity_score, 4),
+        "display_score": round(opportunity_score, 1),
+    })
 
     resolved_must = sum(item["match"] != "unknown" for item in must) / len(must)
     resolved_preferred = 1 if not preferred else sum(item["match"] != "unknown" for item in preferred) / len(preferred)
     resolved_dimensions = sum(item["match"] != "unknown" for item in dimensions.values()) / len(dimensions)
-    confidence = (
-        (10 if current_status != "ambiguous" else 0)
-        + 25 * resolved_must
-        + 5 * resolved_preferred
-        + 15 * resolved_dimensions
-        + (10 if role["company_identity"]["status"] == "confirmed" else 0)
-        + (10 if role["finance"]["grade"] != "UNVERIFIED" else 0)
-        + (10 if role["location_work_policy"]["grade"] != "unknown" else 0)
-        + (8 if role["hiring_process"]["grade"] != "UNKNOWN" else 0)
-        + (7 if role["compensation"]["status"] == "confirmed" and role["compensation"]["grade"] != "unknown" else 0)
-    )
+    confidence_terms = {
+        "posting_status_verified": 10 if current_status != "ambiguous" else 0,
+        "mandatory_evidence_resolved": 25 * resolved_must,
+        "preferred_evidence_resolved": 5 * resolved_preferred,
+        "fit_dimensions_resolved": 15 * resolved_dimensions,
+        "company_identity_confirmed": 10 if role["company_identity"]["status"] == "confirmed" else 0,
+        "finance_verified": 10 if role["finance"]["grade"] != "UNVERIFIED" else 0,
+        "location_work_policy_known": 10 if role["location_work_policy"]["grade"] != "unknown" else 0,
+        "hiring_process_known": 8 if role["hiring_process"]["grade"] != "UNKNOWN" else 0,
+        "compensation_confirmed": 7 if role["compensation"]["status"] == "confirmed" and role["compensation"]["grade"] != "unknown" else 0,
+    }
+    confidence = sum(confidence_terms.values())
+    confidence_calculation = {
+        "formula": "sum(evidence_points)",
+        "resolved_ratios": {
+            "mandatory_requirements": round(resolved_must, 4),
+            "preferred_requirements": round(resolved_preferred, 4),
+            "fit_dimensions": round(resolved_dimensions, 4),
+        },
+        "terms": {key: round(value, 4) for key, value in confidence_terms.items()},
+        "raw_score": round(confidence, 4),
+        "display_score": round(confidence, 1),
+    }
 
     warnings = []
     if hard_exclusion:
@@ -118,6 +176,7 @@ def score_role(role: dict, scoring: dict) -> dict:
         warnings.append(f"evidence confidence below {threshold}")
 
     sensitivity = {}
+    sensitivity_raw = {}
     for name, weights in scoring["sensitivity_profiles"].items():
         value = weighted_score(opportunity_axes, weights)
         if hard_exclusion or current_status == "closed":
@@ -126,11 +185,9 @@ def score_role(role: dict, scoring: dict) -> dict:
             value = min(value, 49)
         elif current_status == "ambiguous":
             value = min(value, 59)
+        sensitivity_raw[name] = value
         sensitivity[name] = round(value, 1)
 
-    match_score = round(match_score, 1)
-    opportunity_score = round(opportunity_score, 1)
-    confidence = round(confidence, 1)
     return {
         "company": role["company"],
         "title": role["title"],
@@ -138,14 +195,17 @@ def score_role(role: dict, scoring: dict) -> dict:
         "current_status": current_status,
         "application_stage": role["application_stage"],
         "offer_stage": role["offer_stage"],
-        "match_score": match_score,
+        "match_score": round(match_score, 1),
         "match_band": band(match_score, [(85, "STRONG"), (70, "SOLID"), (55, "CONDITIONAL"), (0, "WEAK")]),
         "match_components": {key: None if value is None else round(value, 1) for key, value in match_components.items()},
-        "opportunity_score": opportunity_score,
+        "match_calculation": match_calculation,
+        "opportunity_score": round(opportunity_score, 1),
         "opportunity_band": band(opportunity_score, [(80, "HIGH_PRIORITY"), (65, "VIABLE"), (50, "CONDITIONAL"), (0, "LOW")]),
         "opportunity_axes": {key: round(value, 1) for key, value in opportunity_axes.items()},
-        "evidence_confidence": confidence,
+        "opportunity_calculation": opportunity_calculation,
+        "evidence_confidence": round(confidence, 1),
         "confidence_band": band(confidence, [(85, "HIGH"), (70, "USABLE"), (50, "THIN"), (0, "INSUFFICIENT")]),
+        "confidence_calculation": confidence_calculation,
         "ranking_allowed": ranking_allowed,
         "caps": caps,
         "gate_reasons": role["gates"]["reasons"],
@@ -155,6 +215,12 @@ def score_role(role: dict, scoring: dict) -> dict:
         "unknowns": role["unknowns"],
         "resume_actions": role["resume_actions"],
         "evidence": role["evidence"],
+        "_sort": {
+            "match": match_score,
+            "opportunity": opportunity_score,
+            "confidence": confidence,
+            "sensitivity": sensitivity_raw,
+        },
     }
 
 
@@ -169,7 +235,7 @@ def score_document(review: dict, profile: dict) -> dict:
         raise ValueError("candidate_profile_version does not match the supplied profile")
     scoring = profile["scoring"]
     roles = [score_role(role, scoring) for role in review["roles"]]
-    roles.sort(key=lambda role: (not role["ranking_allowed"], -role["opportunity_score"], -role["match_score"], -role["evidence_confidence"], role["company"]))
+    roles.sort(key=lambda role: (not role["ranking_allowed"], -role["_sort"]["opportunity"], -role["_sort"]["match"], -role["_sort"]["confidence"], role["company"]))
     for index, role in enumerate(roles, 1):
         role["rank"] = index if role["ranking_allowed"] else None
         role["sensitivity_rank"] = {}
@@ -177,7 +243,7 @@ def score_document(review: dict, profile: dict) -> dict:
     for name in scoring["sensitivity_profiles"]:
         ranked = sorted(
             (role for role in roles if role["ranking_allowed"]),
-            key=lambda role: (-role["sensitivity"][name], -role["match_score"], -role["evidence_confidence"], role["company"]),
+            key=lambda role: (-role["_sort"]["sensitivity"][name], -role["_sort"]["match"], -role["_sort"]["confidence"], role["company"]),
         )
         sensitivity_rankings[name] = [
             {"company": role["company"], "title": role["title"], "url": role["url"]}
@@ -189,6 +255,8 @@ def score_document(review: dict, profile: dict) -> dict:
         }
         for role in roles:
             role["sensitivity_rank"][name] = ranks.get((role["company"], role["title"], role["url"]))
+    for role in roles:
+        role.pop("_sort")
     return {
         "schema_version": 1,
         "scored_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
@@ -199,6 +267,14 @@ def score_document(review: dict, profile: dict) -> dict:
             "match": scoring["match_weights"],
             "opportunity": scoring["opportunity_weights"],
             "sensitivity": scoring["sensitivity_profiles"],
+        },
+        "calculation_policy": {
+            "match_values": scoring["match_values"],
+            "axis_values": scoring["axis_values"],
+            "caps": CAPS,
+            "confidence_threshold": scoring["confidence_threshold"],
+            "rounding": "compute and rank at full precision; round displayed scores to one decimal",
+            "tie_break": "opportunity, then match, then confidence descending; company ascending",
         },
         "scope": review["scope"],
         "sensitivity_rankings": sensitivity_rankings,
@@ -215,15 +291,30 @@ def self_test() -> int:
     assert role["match_score"] == 98.0
     assert role["opportunity_score"] == 84.9
     assert role["evidence_confidence"] == 93.0
+    assert role["match_calculation"]["numerator"] == 9020
+    assert role["match_calculation"]["denominator"] == 92
+    assert role["match_calculation"]["raw_score"] == 98.0435
+    assert role["opportunity_calculation"]["raw_score"] == 84.9196
+    assert role["confidence_calculation"]["raw_score"] == 93
     assert role["ranking_allowed"] is True
     assert role["sensitivity_rank"] == {"fit_first": 1}
 
     review = sample_document()
-    review["roles"][0]["requirements"]["must_have"][0]["match"] = "missing"
+    review["roles"][0]["requirements"]["must_have"].append({
+        "requirement": "Synthetic missing requirement",
+        "candidate_evidence": "No evidence",
+        "match": "missing",
+    })
     review["roles"][0]["application_stage"] = "DROP"
     result = score_document(review, sample_profile())
-    assert result["roles"][0]["match_score"] <= 59
-    assert result["roles"][0]["opportunity_score"] <= 49
+    role = result["roles"][0]
+    assert role["match_calculation"]["raw_score"] == 73.587
+    assert role["match_calculation"]["active_ceiling"] == 59
+    assert role["match_calculation"]["ceiling_binding"] is True
+    assert role["match_score"] == 59
+    assert role["opportunity_calculation"]["raw_score"] == 67.35
+    assert role["opportunity_calculation"]["active_ceiling"] == 49
+    assert role["opportunity_score"] == 49
 
     review = sample_document()
     review["roles"][0]["gates"] = {"hard_exclusion": True, "reasons": ["synthetic exclusion"]}
@@ -232,6 +323,7 @@ def self_test() -> int:
     result = score_document(review, sample_profile())
     assert result["roles"][0]["opportunity_score"] == 0
     assert result["roles"][0]["ranking_allowed"] is False
+    assert band(84.96, [(85, "STRONG"), (70, "SOLID"), (0, "WEAK")]) == "SOLID"
     print("SELF_TEST_PASS")
     return 0
 

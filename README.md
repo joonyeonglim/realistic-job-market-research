@@ -120,9 +120,26 @@
 | `Opportunity Score` | 재무·통근·전형·보상까지 포함했을 때 나에게 얼마나 좋은 기회인가 |
 | `Evidence Confidence` | 위 판단을 뒷받침하는 현재 자료가 얼마나 완성됐는가 |
 
-필수요건은 `confirmed=100`, `transferable=55`, `missing/unknown=0`으로 계산하고, task ownership·프로덕션 경험·우대사항·레벨·도메인 온보딩 비용을 별도 component로 공개합니다. 하드 제외, 마감, 필수요건 누락은 편리한 조건의 고득점으로 상쇄할 수 없도록 가중합 전에 차단합니다.
+필수요건은 `confirmed=100`, `transferable=55`, `missing/unknown=0`으로 계산하고, task ownership·프로덕션 경험·우대사항·레벨·도메인 온보딩 비용을 별도 component로 공개합니다. 하드 제외, 마감, 필수요건 누락은 가중합 결과에 `0·49·59·74` 상한을 적용해 최종 순위 전에 차단합니다.
+
+이 숫자는 합격 데이터를 학습한 예측치가 아니라 상태 경계를 강제하는 보수적 정책값입니다. 예를 들어 필수요건 `missing`의 Match 상한 `59`는 `SOLID` 진입을 막고, Opportunity 상한 `49`는 재무·통근이 좋아도 `LOW` 밖으로 나가지 못하게 합니다. 필수요건 `unknown` 상한 `74`는 미확인 상태가 `STRONG`으로 표시되는 것을 막습니다.
 
 기본 Opportunity 가중치는 `직무 매칭 45 · 재무 25 · 통근/근무정책 12 · 채용 피로도 8 · 보상/레벨 10`이며 로컬 프로필에서 버전 관리합니다. `fit_first`, `stability_first`, `low_friction` 가중치로 순위를 다시 계산해 상위 후보가 유지되는지도 보여줍니다.
+
+정확한 기본 산식은 다음과 같습니다.
+
+```text
+JD_raw = Σ(component score × component weight) / Σ(applicable weight)
+JD      = min(JD_raw, 59) if mandatory missing
+          min(JD_raw, 74) if mandatory unknown
+
+Opportunity_raw =
+  (45×JD + 25×Finance + 12×Location + 8×Hiring + 10×Compensation) / 100
+
+Confidence = Σ(verified evidence points), maximum 100
+```
+
+예제에서는 우대요건이 없어 해당 가중치 `8`을 분모에서 제외합니다. `JD = 9,020 / 92 = 98.0434… → 98.0`, 이어서 반올림 전 JD를 사용해 `Opportunity = 8,491.9565… / 100 = 84.9195… → 84.9`, 증거점수는 `10+25+5+15+10+10+10+8+0 = 93.0`이 됩니다. 밴드와 순위는 반올림 전 값으로 결정하고 화면 표시만 소수점 첫째 자리로 반올림합니다.
 
 점수는 합격 확률이 아닙니다. component·confidence·적용된 cap·가중치가 함께 없으면 점수를 표시하지 않습니다. 연구 근거와 공식은 [`references/scoring-model.md`](references/scoring-model.md)에 공개합니다.
 

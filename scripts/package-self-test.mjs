@@ -37,6 +37,13 @@ const scored = JSON.parse(run("python3", [
 assert.equal(scored.roles[0].match_score, 98);
 assert.equal(scored.roles[0].opportunity_score, 84.9);
 assert.equal(scored.roles[0].evidence_confidence, 93);
+assert.equal(scored.roles[0].match_calculation.numerator, 9020);
+assert.equal(scored.roles[0].match_calculation.denominator, 92);
+assert.equal(scored.roles[0].match_calculation.raw_score, 98.0435);
+assert.equal(scored.roles[0].opportunity_calculation.numerator, 8491.9565);
+assert.equal(scored.roles[0].opportunity_calculation.denominator, 100);
+assert.equal(scored.roles[0].opportunity_calculation.raw_score, 84.9196);
+assert.equal(scored.roles[0].confidence_calculation.raw_score, 93);
 assert.equal(scored.roles[0].sensitivity_rank.fit_first, 1);
 
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), "realistic-job-market-skill-"));

@@ -54,6 +54,7 @@ Evidence items are HTTP(S) URLs. `candidate_evidence` may be `UNKNOWN` but must 
 - `match_score`, `match_band`, and component scores;
 - `opportunity_score`, `opportunity_band`, and axis scores;
 - `evidence_confidence` and confidence band;
+- `match_calculation`, `opportunity_calculation`, and `confidence_calculation`, including every numeric term, numerator, denominator, raw value, active ceiling, and displayed value;
 - caps, gate warnings, and `ranking_allowed`;
 - alternative Opportunity Scores and ranks for `fit_first`, `stability_first`, and `low_friction` sensitivity profiles.
 

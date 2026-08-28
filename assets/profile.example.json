@@ -11,7 +11,7 @@
     "known_gaps": ["unsupported claims remain UNKNOWN"]
   },
   "scoring": {
-    "model_version": "2026-08-v1",
+    "model_version": "2026-08-v2",
     "match_weights": {
       "mandatory_requirements": 45,
       "task_ownership": 20,
