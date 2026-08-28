@@ -1,35 +1,41 @@
 ---
 name: realistic-job-market-research
-description: "Verify whether live job openings are genuinely worth pursuing by checking the exact JD, candidate evidence, company identity, current finance, location or work policy, compensation, and hiring effort. Use for 'research these jobs realistically', 'which roles are actually worth applying to', or 'separate new, reposted, stale, and misleading openings'. Do not use for mass crawling or submitting applications."
+description: "Collect and audit public job postings, build a lossless filterable ledger, and realistically evaluate a shortlist against a local candidate profile, exact JD, company identity, current finance, commute or work policy, compensation, and hiring effort. Use for 'collect all openings', 'research these jobs realistically', 'which roles are worth the effort', or 'separate new, reposted, stale, and misleading openings'. Never submits applications or mutates profiles."
 ---
 
 # Realistic Job Market Research
 
 ## Purpose
 
-Turn a named shortlist or an audited job ledger into a small, evidence-backed decision set. Distinguish low-cost application preparation from the stricter decision to join an employer.
+Reproduce a complete two-stage workflow: declared-source census and artifact audit first, personalized realistic review second. Distinguish low-cost application preparation from the stricter decision to join an employer.
+
+Before either mode, read and validate the private profile described in [references/personalization.md](references/personalization.md). Default path: `~/.config/realistic-job-market-research/profile.json`.
+
+Resolve supporting scripts from this skill directory, never from the user's project cwd. Claude Code can use `${CLAUDE_SKILL_DIR}`; in Codex, use the absolute directory containing this `SKILL.md`.
 
 ## Workflow
 
-1. Freeze the candidate contract: target roles, proven strengths, unsupported claims, hard exclusions, location or work-policy constraints, compensation needs, and tolerated hiring effort. Version the source instead of paraphrasing it from memory.
-2. State the research scope. Default to named roles or a shortlist from an audited ledger. If the user asks for a market-wide census, stop and say that collection is a separate workflow.
-3. Recheck every role on its current detail page. Record `active`, `closed`, `ambiguous`, or `reposted`. The exact body and source ID outrank the title and search snippet.
-4. Extract mandatory requirements, preferred requirements, duties, employment type, exact location, work policy, compensation, deadline, and hiring steps. Use `UNKNOWN` when the current source does not say.
-5. Resolve the employer identity before assigning finance. Then verify current financial facts using the source order and identity gate in [references/evidence-contract.md](references/evidence-contract.md).
-6. Match each mandatory requirement to candidate evidence as `confirmed`, `transferable`, `missing`, or `unknown`. Never turn a preferred skill into a mandatory one or fill a gap with adjacent experience.
-7. Make two decisions: `PREPARE | CONDITIONAL | DROP` for application effort, and `PASS | HOLD | NO_GO` for accepting the employer. A cheap application may be `PREPARE` while the employer remains `HOLD`.
-8. Adversarially recheck the leaders. Look for degree floors, customer-facing work, language requirements, scale claims, mandatory frameworks, hidden tests, stale finance, and current-founder or commitment signals in the resume.
-9. Produce the shortlist, hard exclusions, corrections to prior findings, evidence links, unknowns, and resume-signal changes. Validate JSON output with `python3 scripts/validate_review.py <review.json>`.
+1. Freeze the candidate contract from the local profile and verify referenced resume hashes. Do not paraphrase a mutable resume from memory.
+2. Choose a mode. `census` owns declared public collection and the filterable ledger. `review` starts from an audited ledger or named shortlist. `update` compares prior IDs and bodies with current pages.
+3. For `census`, read [references/census-runbook.md](references/census-runbook.md), initialize a new immutable run, attempt all 29 registered sources, preserve blocked or failed zero-row artifacts, sync terminal states, build the manifest and dashboard, then run both executable gates.
+4. For `review`, recheck every selected role on its current detail page. The exact body and source ID outrank title, tags, and search snippets.
+5. Extract mandatory and preferred requirements, duties, employment, exact location, work policy, compensation, deadline, and hiring steps. Use `UNKNOWN` when absent.
+6. Resolve employer identity before finance. Match every mandatory requirement to profile evidence as `confirmed`, `transferable`, `missing`, or `unknown`.
+7. Make two decisions: `PREPARE | CONDITIONAL | DROP` for application effort and `PASS | HOLD | NO_GO` for the employer or offer.
+8. Adversarially recheck leaders using [references/pitfalls.md](references/pitfalls.md), including degree floors, customer-facing work, language, mandatory frameworks, scale, hidden tests, stale finance, and founder-commitment signals.
+9. Produce coverage, shortlist, hard exclusions, corrections, claim-level sources, unknowns, and resume actions. Validate machine-readable output.
 
 ## Modes
 
-- **Named shortlist:** deeply verify the roles supplied by the user.
-- **Audited ledger:** select a small review set from a ledger whose collection limits are already known; do not call unreviewed rows exclusions.
-- **Update correction:** compare prior source IDs and URLs with current pages; label genuinely new, reposted, previously missed, closed, and materially changed roles separately.
+- **Census:** run `<skill-dir>/scripts/run-census.mjs --run-dir /absolute/run/path` with Node.js.
+- **Named shortlist:** deeply verify roles supplied by the user.
+- **Audited ledger:** select a small review set; unreviewed rows are not exclusions.
+- **Update correction:** label genuinely new, reposted, previously missed, closed, and materially changed roles separately.
 
 ## Rules
 
 - Prefer official career pages and exact job details. A search result is discovery evidence, not proof that a role is active.
+- Never call a query-limited, blocked, or failed source complete. Never synthesize rows from provider totals.
 - Preserve conflicting facts with both sources; do not average them.
 - Do not infer salary, work policy, degree requirements, finance, or hiring steps.
 - Do not express unsupported hiring probabilities as percentages. Use reasoned `high`, `medium`, or `low` fit labels.
@@ -39,5 +45,12 @@ Turn a named shortlist or an audited job ledger into a small, evidence-backed de
 
 ## References
 
+- [references/census-runbook.md](references/census-runbook.md) — read for collection, resume, and artifact transitions.
+- [references/source-registry.md](references/source-registry.md) — 29-source scope and completeness contract.
+- [references/raw-schema.md](references/raw-schema.md) and [references/verification-gates.md](references/verification-gates.md) — read before build or audit claims.
 - [references/evidence-contract.md](references/evidence-contract.md) — read before finance, identity, status, or decision classification.
 - [references/review-schema.md](references/review-schema.md) — read when producing or validating machine-readable review JSON.
+- [references/personalization.md](references/personalization.md) — local profile and public/private boundary.
+- [references/authenticated-sources.md](references/authenticated-sources.md) — read before any personalized browser source.
+- [references/pitfalls.md](references/pitfalls.md) — adversarial checks learned from failed scans.
+- [references/reproducibility.md](references/reproducibility.md) — frozen reference-run parity evidence.

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "run_id": "2030-01-15-ai-census",
+  "recorded_at": "2030-01-15T12:00:00Z",
+  "checks": {
+    "self_test": {"verdict": "PASS"},
+    "synthetic_smoke": {"verdict": "PASS", "rows": 40001, "pages": 401},
+    "reproducibility": {"verdict": "PASS", "identities_equal": true, "manifest_counts_equal": true},
+    "browser": {
+      "verdict": "PASS",
+      "environment": "record the exact OS, browser, and local HTTP transport",
+      "desktop": {"total_count": 0, "load_ms": 0},
+      "candidate_filter": {"total_count": 0, "repaint_ms": 0},
+      "mobile": {"viewport_width": 390, "document_scroll_width": 390, "document_client_width": 390},
+      "console_errors": []
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "profile_version": "example-v1",
+  "captured_at": "2030-01-15T00:00:00Z",
+  "career_years": 6.0,
+  "candidate": {
+    "target_roles": ["Applied AI Engineer", "AI Product Engineer"],
+    "defensible_level": "senior hands-on individual contributor",
+    "degree": "bachelor",
+    "proven_strengths": ["production AI systems", "end-to-end product delivery"],
+    "known_gaps": ["unsupported claims remain UNKNOWN"]
+  },
+  "preferences": {
+    "hard_exclusions": ["user-defined excluded domains"],
+    "finance_policy": "avoid established chronic-loss employers",
+    "hiring_effort_max": "F2",
+    "hands_on_lead_allowed": true,
+    "location_anchor": "user-defined transit anchor",
+    "commute_tiers": [
+      {"grade": "T1", "rule": "direct or short commute"},
+      {"grade": "T2", "rule": "acceptable commute"},
+      {"grade": "T3", "rule": "long commute"}
+    ]
+  },
+  "resume": {
+    "source_files": [],
+    "ordering": ["summary", "reverse-chronological experience", "skills", "education"],
+    "commitment_statement": "user-confirmed statement or UNKNOWN"
+  }
+}

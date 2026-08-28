@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "run_id": "2026-08-28-applied-ai-update-census",
+  "source_count": 29,
+  "total_source_rows": 29469,
+  "source_attempt_counts": {
+    "attempted": 29,
+    "row_producing": 12,
+    "complete": 6,
+    "partial": 7,
+    "blocked": 3,
+    "failed": 13
+  },
+  "relevance_counts": {
+    "candidate": 19,
+    "excluded": 6,
+    "unknown": 0,
+    "unreviewed": 29444
+  },
+  "coverage_counts": {
+    "complete_query": 416,
+    "complete_surface": 12222,
+    "partial": 16831
+  },
+  "row_identity_sha256": "8a9fd83e095f91ad3330bd458b22b7326059a86e7e8edecca8d7512a167a662b"
+}
