@@ -120,7 +120,7 @@ const noProfileRun = path.join(noProfileHome, "run");
 const noProfile = spawnSync(process.execPath, [path.join(here, "init-run.mjs"), "--run-dir", noProfileRun], {
   cwd: root,
   encoding: "utf8",
-  env: { ...process.env, HOME: noProfileHome }
+  env: { ...process.env, HOME: noProfileHome, USERPROFILE: noProfileHome }
 });
 assert.equal(noProfile.status, 0, noProfile.stderr);
 assert.equal(fs.existsSync(path.join(noProfileRun, "profile.json")), false);
@@ -130,7 +130,7 @@ const profileHome = fs.mkdtempSync(path.join(os.tmpdir(), "realistic-job-market-
 const initializedProfile = spawnSync(process.execPath, [path.join(here, "init-profile.mjs")], {
   cwd: root,
   encoding: "utf8",
-  env: { ...process.env, HOME: profileHome }
+  env: { ...process.env, HOME: profileHome, USERPROFILE: profileHome }
 });
 assert.equal(initializedProfile.status, 0, initializedProfile.stderr);
 const initializedProfilePath = path.join(profileHome, ".config", "realistic-job-market-research", "profile.json");
