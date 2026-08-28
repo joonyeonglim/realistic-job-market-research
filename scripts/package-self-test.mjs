@@ -26,7 +26,18 @@ assert.match(run(process.execPath, [path.join(here, "self-test.mjs")]), /PASS/);
 assert.match(run(process.execPath, [path.join(here, "smoke-dashboard.mjs")]), /SMOKE_DASHBOARD_PASS/);
 assert.equal(run("python3", [path.join(here, "validate_profile.py"), "--self-test"]), "SELF_TEST_PASS");
 assert.equal(run("python3", [path.join(here, "validate_review.py"), "--self-test"]), "SELF_TEST_PASS");
+assert.equal(run("python3", [path.join(here, "score_review.py"), "--self-test"]), "SELF_TEST_PASS");
 assert.equal(run("python3", [path.join(here, "validate_profile.py"), path.join(root, "assets/profile.example.json")]), "VALID");
+assert.equal(run("python3", [path.join(here, "validate_review.py"), path.join(root, "assets/score-review.example.json")]), "VALID");
+const scored = JSON.parse(run("python3", [
+  path.join(here, "score_review.py"),
+  "--input", path.join(root, "assets/score-review.example.json"),
+  "--profile", path.join(root, "assets/profile.example.json")
+]));
+assert.equal(scored.roles[0].match_score, 98);
+assert.equal(scored.roles[0].opportunity_score, 84.9);
+assert.equal(scored.roles[0].evidence_confidence, 93);
+assert.equal(scored.roles[0].sensitivity_rank.fit_first, 1);
 
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), "realistic-job-market-skill-"));
 const runDir = path.join(temp, "run");

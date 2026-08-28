@@ -43,8 +43,8 @@ Use the newest fiscal year available and state the year. Prefer regulator filing
 
 | Grade | Meaning |
 |---|---|
-| `A` | Operating profit, with trend and balance-sheet caveats recorded. |
-| `B` | Near break-even, rapidly improving, or backed by a demonstrably stable parent. |
+| `A` | Durable operating profit, with trend and balance-sheet caveats recorded. |
+| `B` | One-year turnaround, near break-even, rapidly improving, or backed by a demonstrably stable parent. |
 | `C` | Early-stage loss where runway remains a material offer risk. |
 | `D` | Established chronic loss, severe deficit, or restructuring signal. |
 | `UNVERIFIED` | Legal identity or current figures are not verified. |

@@ -39,7 +39,7 @@ Checksums:
 |---|---|
 | `github-social-preview.png` | `dfd94a0d290d2866cf13fcf35057a119a5cef97c9c55c7b4a5124fc5b860e688` |
 | `social-preview.png` | `428917cc6a60553dd7ff1e7241c02e91b23a309b9c7888c6817018a4de467303` |
-| `workflow-overview.svg` | `7204415033a25ccda7db66cb1a38d4c5b7874be2182372668b953372ee183a5c` |
-| `workflow-overview.png` | `57d84869656579c960513b14258a0fd34642b4855afe112d8a3360f81a1d715b` |
+| `workflow-overview.svg` | `77a663278e863416fb84eb3dbd12eaca973893d701ad6e10f61bdb6eda1b87f0` |
+| `workflow-overview.png` | `3564bfb302c722db3864e76d24b8d297d3c335bbfbecb3de6fa32ba958b72de0` |
 
 The original generated image remains unchanged. Derived files are separate assets and are included under the repository license.

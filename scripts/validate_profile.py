@@ -44,6 +44,29 @@ def nonempty_list(parent: dict, key: str, path: str, errors: list[str]) -> list:
     return value
 
 
+def is_number(value: object) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def validate_weights(value: object, path: str, expected_keys: set[str], errors: list[str]) -> None:
+    if not isinstance(value, dict) or set(value) != expected_keys:
+        errors.append(f"{path}: expected keys {sorted(expected_keys)}")
+        return
+    if any(not is_number(weight) or weight < 0 for weight in value.values()):
+        errors.append(f"{path}: weights must be non-negative numbers")
+        return
+    if abs(sum(value.values()) - 100) > 1e-9:
+        errors.append(f"{path}: weights must sum to 100")
+
+
+def validate_score_map(value: object, path: str, expected_keys: set[str], errors: list[str]) -> None:
+    if not isinstance(value, dict) or set(value) != expected_keys:
+        errors.append(f"{path}: expected keys {sorted(expected_keys)}")
+        return
+    if any(not is_number(score) or not 0 <= score <= 100 for score in value.values()):
+        errors.append(f"{path}: scores must be numbers from 0 to 100")
+
+
 def validate(profile: object, check_sources: bool = False) -> list[str]:
     errors = walk_forbidden(profile)
     if not isinstance(profile, dict):
@@ -67,6 +90,35 @@ def validate(profile: object, check_sources: bool = False) -> list[str]:
     for field in ("defensible_level", "degree"):
         if not isinstance(candidate.get(field), str) or not candidate[field].strip():
             errors.append(f"$.candidate.{field}: expected non-empty string")
+
+    scoring = profile.get("scoring")
+    if not isinstance(scoring, dict):
+        errors.append("$.scoring: expected object")
+        scoring = {}
+    if not isinstance(scoring.get("model_version"), str) or not scoring.get("model_version", "").strip():
+        errors.append("$.scoring.model_version: expected non-empty string")
+    match_keys = {"mandatory_requirements", "task_ownership", "production_delivery", "preferred_requirements", "level_scope", "domain_onboarding"}
+    opportunity_keys = {"match_score", "finance", "location_work_policy", "hiring_process", "compensation_level"}
+    validate_weights(scoring.get("match_weights"), "$.scoring.match_weights", match_keys, errors)
+    validate_weights(scoring.get("opportunity_weights"), "$.scoring.opportunity_weights", opportunity_keys, errors)
+    validate_score_map(scoring.get("match_values"), "$.scoring.match_values", {"confirmed", "transferable", "missing", "unknown"}, errors)
+    axis_values = scoring.get("axis_values")
+    if not isinstance(axis_values, dict) or set(axis_values) != {"finance", "location_work_policy", "hiring_process", "compensation_level"}:
+        errors.append("$.scoring.axis_values: expected four opportunity axes")
+    else:
+        validate_score_map(axis_values["finance"], "$.scoring.axis_values.finance", {"A", "B", "C", "D", "UNVERIFIED"}, errors)
+        validate_score_map(axis_values["location_work_policy"], "$.scoring.axis_values.location_work_policy", {"good", "acceptable", "poor", "unknown"}, errors)
+        validate_score_map(axis_values["hiring_process"], "$.scoring.axis_values.hiring_process", {"F0", "F1", "F2", "F3", "UNKNOWN"}, errors)
+        validate_score_map(axis_values["compensation_level"], "$.scoring.axis_values.compensation_level", {"good", "acceptable", "poor", "unknown"}, errors)
+    threshold = scoring.get("confidence_threshold")
+    if not is_number(threshold) or not 0 <= threshold <= 100:
+        errors.append("$.scoring.confidence_threshold: expected number from 0 to 100")
+    profiles = scoring.get("sensitivity_profiles")
+    if not isinstance(profiles, dict) or not profiles:
+        errors.append("$.scoring.sensitivity_profiles: expected non-empty object")
+    else:
+        for name, weights in profiles.items():
+            validate_weights(weights, f"$.scoring.sensitivity_profiles.{name}", opportunity_keys, errors)
 
     preferences = profile.get("preferences")
     if not isinstance(preferences, dict):
@@ -115,6 +167,20 @@ def sample() -> dict:
             "degree": "bachelor",
             "proven_strengths": ["production AI"],
             "known_gaps": ["scale evidence unavailable"]
+        },
+        "scoring": {
+            "model_version": "2026-08-v1",
+            "match_weights": {"mandatory_requirements": 45, "task_ownership": 20, "production_delivery": 15, "preferred_requirements": 8, "level_scope": 8, "domain_onboarding": 4},
+            "opportunity_weights": {"match_score": 45, "finance": 25, "location_work_policy": 12, "hiring_process": 8, "compensation_level": 10},
+            "match_values": {"confirmed": 100, "transferable": 55, "missing": 0, "unknown": 0},
+            "axis_values": {
+                "finance": {"A": 100, "B": 75, "C": 35, "D": 0, "UNVERIFIED": 0},
+                "location_work_policy": {"good": 100, "acceptable": 65, "poor": 20, "unknown": 0},
+                "hiring_process": {"F0": 100, "F1": 80, "F2": 55, "F3": 20, "UNKNOWN": 0},
+                "compensation_level": {"good": 100, "acceptable": 65, "poor": 20, "unknown": 0},
+            },
+            "confidence_threshold": 70,
+            "sensitivity_profiles": {"fit_first": {"match_score": 60, "finance": 15, "location_work_policy": 8, "hiring_process": 7, "compensation_level": 10}},
         },
         "preferences": {
             "hard_exclusions": ["excluded domain"],

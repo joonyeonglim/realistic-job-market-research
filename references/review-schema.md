@@ -24,13 +24,14 @@
 
 - `company`, `title`, `url`;
 - `current_status`: `active | closed | ambiguous | reposted`;
-- `requirements.must_have[]`: `requirement`, `candidate_evidence`, and `match`;
-- `fit`: `level` (`high | medium | low`) and `reason`;
+- `requirements.must_have[]` and `requirements.preferred[]`: `requirement`, `candidate_evidence`, and `match`;
+- `fit`: `level` (`high | medium | low`), `reason`, and four scored dimensions: `task_ownership`, `production_delivery`, `level_scope`, and `domain_onboarding`; each dimension has `match` and `reason`;
+- `gates`: `hard_exclusion` boolean and `reasons[]`;
 - `company_identity`: `status` (`confirmed | unverified`), `matched_fields[]`, `evidence[]`;
 - `finance`: `grade` (`A | B | C | D | UNVERIFIED`), `as_of`, `facts[]`, `evidence[]`;
 - `location_work_policy`: `grade` (`good | acceptable | poor | unknown`), `facts[]`, `evidence[]`;
 - `hiring_process`: `grade` (`F0 | F1 | F2 | F3 | UNKNOWN`), `steps[]`, `evidence[]`;
-- `compensation`: `status` (`confirmed | unknown`), `facts[]`, `evidence[]`;
+- `compensation`: `status` (`confirmed | unknown`), `grade` (`good | acceptable | poor | unknown`), `facts[]`, and `evidence[]`;
 - `application_stage`: `PREPARE | CONDITIONAL | DROP`;
 - `offer_stage`: `PASS | HOLD | NO_GO`;
 - `decision_reason`, `unknowns[]`, `resume_actions[]`, and top-level `evidence[]`.
@@ -40,6 +41,20 @@ Evidence items are HTTP(S) URLs. `candidate_evidence` may be `UNKNOWN` but must 
 ## Validator invariants
 
 - Closed roles cannot be `PREPARE` or offer-stage `PASS`.
+- A hard exclusion requires `DROP / NO_GO`.
+- A missing mandatory requirement cannot be `PREPARE`.
 - Unverified legal identity requires finance `UNVERIFIED`.
 - Offer-stage `PASS` requires an active role, confirmed identity and compensation, verified finance, known location or work policy and hiring process, and no `missing` or `unknown` mandatory requirement.
 - Recruiter contact fields are rejected.
+
+## Scoring output
+
+`scripts/score_review.py` preserves role identity and decisions, then adds:
+
+- `match_score`, `match_band`, and component scores;
+- `opportunity_score`, `opportunity_band`, and axis scores;
+- `evidence_confidence` and confidence band;
+- caps, gate warnings, and `ranking_allowed`;
+- alternative Opportunity Scores and ranks for `fit_first`, `stability_first`, and `low_friction` sensitivity profiles.
+
+See [scoring-model.md](scoring-model.md) for formulas and interpretation.

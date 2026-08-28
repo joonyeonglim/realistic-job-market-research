@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "as_of": "2030-01-15",
+  "candidate_profile_version": "example-v1",
+  "scope": {
+    "kind": "named_shortlist",
+    "statement": "One synthetic role for scoring",
+    "coverage_limits": ["Synthetic example; not a market census"]
+  },
+  "roles": [
+    {
+      "company": "Example Labs",
+      "title": "AI Agent Engineer",
+      "url": "https://example.com/jobs/agent-engineer",
+      "current_status": "active",
+      "requirements": {
+        "must_have": [
+          {
+            "requirement": "Production Python",
+            "candidate_evidence": "Dated project evidence",
+            "match": "confirmed"
+          }
+        ],
+        "preferred": []
+      },
+      "fit": {
+        "level": "high",
+        "reason": "Mandatory experience is directly evidenced.",
+        "dimensions": {
+          "task_ownership": {"match": "confirmed", "reason": "Owned the task."},
+          "production_delivery": {"match": "confirmed", "reason": "Shipped to production."},
+          "level_scope": {"match": "confirmed", "reason": "Level is aligned."},
+          "domain_onboarding": {"match": "transferable", "reason": "Adjacent domain."}
+        }
+      },
+      "gates": {"hard_exclusion": false, "reasons": []},
+      "company_identity": {
+        "status": "confirmed",
+        "matched_fields": ["domain", "legal_name"],
+        "evidence": ["https://example.com/jobs/agent-engineer"]
+      },
+      "finance": {
+        "grade": "A",
+        "as_of": "2029",
+        "facts": ["Audited operating profit"],
+        "evidence": ["https://example.com/jobs/agent-engineer"]
+      },
+      "location_work_policy": {
+        "grade": "acceptable",
+        "facts": ["Two office days"],
+        "evidence": ["https://example.com/jobs/agent-engineer"]
+      },
+      "hiring_process": {
+        "grade": "F0",
+        "steps": ["Interview"],
+        "evidence": ["https://example.com/jobs/agent-engineer"]
+      },
+      "compensation": {
+        "status": "unknown",
+        "grade": "unknown",
+        "facts": [],
+        "evidence": []
+      },
+      "application_stage": "PREPARE",
+      "offer_stage": "HOLD",
+      "decision_reason": "Low-cost application; compensation remains unknown.",
+      "unknowns": ["Compensation"],
+      "resume_actions": ["Lead with production Python evidence"],
+      "evidence": ["https://example.com/jobs/agent-engineer"]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
   <title id="title">Realistic Job Market Research workflow</title>
-  <desc id="desc">A personalized profile and 29 public sources become an immutable raw ledger, pass through job-description, company-identity, finance, commute, and hiring-process verification, and produce separate application and offer decisions with audit evidence.</desc>
+  <desc id="desc">A personalized profile and 29 public sources become an immutable raw ledger, pass through exact job-description and employer verification, receive separate match, opportunity, and evidence-confidence scores with hard gates and sensitivity analysis, and produce separate application and offer decisions.</desc>
   <defs>
     <linearGradient id="navy" x1="0" x2="1" y1="0" y2="1">
       <stop offset="0" stop-color="#102a43"/>
@@ -86,15 +86,15 @@
 
       <rect x="824" y="348" width="300" height="112" rx="18" fill="#fffdf9" stroke="#d8d4c9"/>
       <rect x="846" y="370" width="8" height="68" rx="4" fill="#d7a84b"/>
-      <text x="876" y="391" class="label">법인 신원 + 재무</text>
-      <text x="876" y="421" class="body">2-of-4 identity gate</text>
-      <text x="876" y="443" class="body">연도·출처·충돌 보존</text>
+      <text x="876" y="391" class="label">회사 · 현실 검증</text>
+      <text x="876" y="421" class="body">법인 2-of-4 · 재무</text>
+      <text x="876" y="443" class="body">통근 · 근무 · 전형 · 보상</text>
 
       <rect x="824" y="484" width="300" height="112" rx="18" fill="#fffdf9" stroke="#d8d4c9"/>
       <rect x="846" y="506" width="8" height="68" rx="4" fill="#a83232"/>
-      <text x="876" y="527" class="label">현실 비용 검증</text>
-      <text x="876" y="557" class="body">통근 · 근무정책 · 보상</text>
-      <text x="876" y="579" class="body">채용 피로도 F0–F3</text>
+      <text x="876" y="527" class="label">3개 점수 + 게이트</text>
+      <text x="876" y="557" class="body">Match · Opportunity</text>
+      <text x="876" y="579" class="body">Confidence · cap · sensitivity</text>
     </g>
 
     <path class="connector" d="M1124 268 C1180 268 1175 331 1218 331"/>

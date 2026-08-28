@@ -21,6 +21,7 @@ ALLOWED = {
     "location": {"good", "acceptable", "poor", "unknown"},
     "hiring": {"F0", "F1", "F2", "F3", "UNKNOWN"},
     "compensation": {"confirmed", "unknown"},
+    "comp_grade": {"good", "acceptable", "poor", "unknown"},
     "application": {"PREPARE", "CONDITIONAL", "DROP"},
     "offer": {"PASS", "HOLD", "NO_GO"},
 }
@@ -94,6 +95,19 @@ def validate_urls(items: list, path: str, errors: list[str]) -> None:
             errors.append(f"{path}[{index}]: expected HTTP(S) URL")
 
 
+def validate_match_items(items: list, path: str, errors: list[str]) -> list[str]:
+    matches: list[str] = []
+    for index, item in enumerate(items):
+        item_path = f"{path}[{index}]"
+        if not isinstance(item, dict):
+            errors.append(f"{item_path}: expected object")
+            continue
+        require_string(item, "requirement", item_path, errors)
+        require_string(item, "candidate_evidence", item_path, errors)
+        matches.append(require_enum(item, "match", ALLOWED["match"], item_path, errors))
+    return matches
+
+
 def validate_role(role: object, index: int) -> list[str]:
     path = f"$.roles[{index}]"
     errors: list[str] = []
@@ -112,21 +126,35 @@ def validate_role(role: object, index: int) -> list[str]:
     must_have = require_list(
         requirements, "must_have", f"{path}.requirements", errors
     )
-    matches: list[str] = []
-    for req_index, requirement in enumerate(must_have):
-        req_path = f"{path}.requirements.must_have[{req_index}]"
-        if not isinstance(requirement, dict):
-            errors.append(f"{req_path}: expected object")
-            continue
-        require_string(requirement, "requirement", req_path, errors)
-        require_string(requirement, "candidate_evidence", req_path, errors)
-        matches.append(
-            require_enum(requirement, "match", ALLOWED["match"], req_path, errors)
-        )
+    if not must_have:
+        errors.append(f"{path}.requirements.must_have: expected at least one item")
+    matches = validate_match_items(must_have, f"{path}.requirements.must_have", errors)
+    preferred = require_list(
+        requirements, "preferred", f"{path}.requirements", errors
+    )
+    validate_match_items(preferred, f"{path}.requirements.preferred", errors)
 
     fit = require_dict(role, "fit", path, errors)
     require_enum(fit, "level", ALLOWED["fit"], f"{path}.fit", errors)
     require_string(fit, "reason", f"{path}.fit", errors)
+    dimensions = require_dict(fit, "dimensions", f"{path}.fit", errors)
+    for dimension in (
+        "task_ownership",
+        "production_delivery",
+        "level_scope",
+        "domain_onboarding",
+    ):
+        value = require_dict(dimensions, dimension, f"{path}.fit.dimensions", errors)
+        require_enum(value, "match", ALLOWED["match"], f"{path}.fit.dimensions.{dimension}", errors)
+        require_string(value, "reason", f"{path}.fit.dimensions.{dimension}", errors)
+
+    gates = require_dict(role, "gates", path, errors)
+    hard_exclusion = gates.get("hard_exclusion")
+    if not isinstance(hard_exclusion, bool):
+        errors.append(f"{path}.gates.hard_exclusion: expected boolean")
+    gate_reasons = require_list(gates, "reasons", f"{path}.gates", errors)
+    if hard_exclusion is True and not gate_reasons:
+        errors.append(f"{path}.gates.reasons: hard exclusion requires a reason")
 
     identity = require_dict(role, "company_identity", path, errors)
     identity_status = require_enum(
@@ -136,12 +164,14 @@ def validate_role(role: object, index: int) -> list[str]:
         f"{path}.company_identity",
         errors,
     )
-    require_list(identity, "matched_fields", f"{path}.company_identity", errors)
+    matched_fields = require_list(identity, "matched_fields", f"{path}.company_identity", errors)
     validate_urls(
         require_list(identity, "evidence", f"{path}.company_identity", errors),
         f"{path}.company_identity.evidence",
         errors,
     )
+    if identity_status == "confirmed" and len(matched_fields) < 2:
+        errors.append(f"{path}.company_identity.matched_fields: confirmed identity requires at least two matches")
 
     finance = require_dict(role, "finance", path, errors)
     finance_grade = require_enum(
@@ -149,11 +179,14 @@ def validate_role(role: object, index: int) -> list[str]:
     )
     require_string(finance, "as_of", f"{path}.finance", errors)
     require_list(finance, "facts", f"{path}.finance", errors)
+    finance_evidence = require_list(finance, "evidence", f"{path}.finance", errors)
     validate_urls(
-        require_list(finance, "evidence", f"{path}.finance", errors),
+        finance_evidence,
         f"{path}.finance.evidence",
         errors,
     )
+    if finance_grade != "UNVERIFIED" and not finance_evidence:
+        errors.append(f"{path}.finance.evidence: verified finance requires evidence")
 
     location = require_dict(role, "location_work_policy", path, errors)
     location_grade = require_enum(
@@ -164,22 +197,28 @@ def validate_role(role: object, index: int) -> list[str]:
         errors,
     )
     require_list(location, "facts", f"{path}.location_work_policy", errors)
+    location_evidence = require_list(location, "evidence", f"{path}.location_work_policy", errors)
     validate_urls(
-        require_list(location, "evidence", f"{path}.location_work_policy", errors),
+        location_evidence,
         f"{path}.location_work_policy.evidence",
         errors,
     )
+    if location_grade != "unknown" and not location_evidence:
+        errors.append(f"{path}.location_work_policy.evidence: known location requires evidence")
 
     hiring = require_dict(role, "hiring_process", path, errors)
     hiring_grade = require_enum(
         hiring, "grade", ALLOWED["hiring"], f"{path}.hiring_process", errors
     )
     require_list(hiring, "steps", f"{path}.hiring_process", errors)
+    hiring_evidence = require_list(hiring, "evidence", f"{path}.hiring_process", errors)
     validate_urls(
-        require_list(hiring, "evidence", f"{path}.hiring_process", errors),
+        hiring_evidence,
         f"{path}.hiring_process.evidence",
         errors,
     )
+    if hiring_grade != "UNKNOWN" and not hiring_evidence:
+        errors.append(f"{path}.hiring_process.evidence: known hiring process requires evidence")
 
     compensation = require_dict(role, "compensation", path, errors)
     compensation_status = require_enum(
@@ -189,12 +228,26 @@ def validate_role(role: object, index: int) -> list[str]:
         f"{path}.compensation",
         errors,
     )
+    compensation_grade = require_enum(
+        compensation,
+        "grade",
+        ALLOWED["comp_grade"],
+        f"{path}.compensation",
+        errors,
+    )
     require_list(compensation, "facts", f"{path}.compensation", errors)
+    compensation_evidence = require_list(compensation, "evidence", f"{path}.compensation", errors)
     validate_urls(
-        require_list(compensation, "evidence", f"{path}.compensation", errors),
+        compensation_evidence,
         f"{path}.compensation.evidence",
         errors,
     )
+    if compensation_status == "confirmed" and compensation_grade == "unknown":
+        errors.append(f"{path}.compensation.grade: confirmed compensation requires a known grade")
+    if compensation_status == "unknown" and compensation_grade != "unknown":
+        errors.append(f"{path}.compensation.grade: unknown compensation requires grade unknown")
+    if compensation_status == "confirmed" and not compensation_evidence:
+        errors.append(f"{path}.compensation.evidence: confirmed compensation requires evidence")
 
     application = require_enum(
         role, "application_stage", ALLOWED["application"], path, errors
@@ -213,6 +266,12 @@ def validate_role(role: object, index: int) -> list[str]:
         errors.append(f"{path}: closed role cannot have offer_stage PASS")
     if identity_status == "unverified" and finance_grade != "UNVERIFIED":
         errors.append(f"{path}: unverified identity requires finance grade UNVERIFIED")
+    if hard_exclusion is True and application != "DROP":
+        errors.append(f"{path}: hard exclusion requires application_stage DROP")
+    if hard_exclusion is True and offer != "NO_GO":
+        errors.append(f"{path}: hard exclusion requires offer_stage NO_GO")
+    if "missing" in matches and application == "PREPARE":
+        errors.append(f"{path}: missing mandatory requirement cannot be PREPARE")
     if offer == "PASS":
         if current != "active":
             errors.append(f"{path}: PASS requires active current_status")
@@ -224,6 +283,7 @@ def validate_role(role: object, index: int) -> list[str]:
             location_grade == "unknown"
             or hiring_grade == "UNKNOWN"
             or compensation_status != "confirmed"
+            or compensation_grade in {"poor", "unknown"}
         ):
             errors.append(
                 f"{path}: PASS requires known location, hiring process, and compensation"
@@ -262,7 +322,7 @@ def sample_document() -> dict:
     return {
         "schema_version": 1,
         "as_of": "2030-01-15",
-        "candidate_profile_version": "profile-v3",
+        "candidate_profile_version": "example-v1",
         "scope": {
             "kind": "named_shortlist",
             "statement": "One synthetic role",
@@ -281,12 +341,20 @@ def sample_document() -> dict:
                             "candidate_evidence": "Dated project evidence",
                             "match": "confirmed",
                         }
-                    ]
+                    ],
+                    "preferred": []
                 },
                 "fit": {
                     "level": "high",
                     "reason": "Mandatory experience is directly evidenced.",
+                    "dimensions": {
+                        "task_ownership": {"match": "confirmed", "reason": "Owned the task."},
+                        "production_delivery": {"match": "confirmed", "reason": "Shipped to production."},
+                        "level_scope": {"match": "confirmed", "reason": "Level is aligned."},
+                        "domain_onboarding": {"match": "transferable", "reason": "Adjacent domain."},
+                    },
                 },
+                "gates": {"hard_exclusion": False, "reasons": []},
                 "company_identity": {
                     "status": "confirmed",
                     "matched_fields": ["domain", "legal_name"],
@@ -310,6 +378,7 @@ def sample_document() -> dict:
                 },
                 "compensation": {
                     "status": "unknown",
+                    "grade": "unknown",
                     "facts": [],
                     "evidence": [],
                 },

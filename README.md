@@ -110,7 +110,23 @@
 
 따라서 `PREPARE / HOLD`라는 현실적인 결론을 낼 수 있습니다. 서류는 준비할 가치가 있지만 회사 선택은 아직 보류라는 뜻입니다.
 
-### 8. 범용 이력서를 공고별로 어디부터 바꿀지 알 수 있습니다
+### 8. 매칭 점수가 감이 아니라 근거와 가중치로 계산됩니다
+
+한 숫자에 모든 판단을 섞지 않고 세 점수를 나눠 보여줍니다.
+
+| 점수 | 답하는 질문 |
+|---|---|
+| `JD Match Score` | 실제 업무와 필수요건을 수행할 경력 증거가 얼마나 있는가 |
+| `Opportunity Score` | 재무·통근·전형·보상까지 포함했을 때 나에게 얼마나 좋은 기회인가 |
+| `Evidence Confidence` | 위 판단을 뒷받침하는 현재 자료가 얼마나 완성됐는가 |
+
+필수요건은 `confirmed=100`, `transferable=55`, `missing/unknown=0`으로 계산하고, task ownership·프로덕션 경험·우대사항·레벨·도메인 온보딩 비용을 별도 component로 공개합니다. 하드 제외, 마감, 필수요건 누락은 편리한 조건의 고득점으로 상쇄할 수 없도록 가중합 전에 차단합니다.
+
+기본 Opportunity 가중치는 `직무 매칭 45 · 재무 25 · 통근/근무정책 12 · 채용 피로도 8 · 보상/레벨 10`이며 로컬 프로필에서 버전 관리합니다. `fit_first`, `stability_first`, `low_friction` 가중치로 순위를 다시 계산해 상위 후보가 유지되는지도 보여줍니다.
+
+점수는 합격 확률이 아닙니다. component·confidence·적용된 cap·가중치가 함께 없으면 점수를 표시하지 않습니다. 연구 근거와 공식은 [`references/scoring-model.md`](references/scoring-model.md)에 공개합니다.
+
+### 9. 범용 이력서를 공고별로 어디부터 바꿀지 알 수 있습니다
 
 단순히 JD 키워드를 이력서에 추가하지 않습니다.
 
@@ -124,7 +140,7 @@
 
 회사 순서를 무리하게 뒤집기보다, 요약과 경력 bullet에서 어떤 증거를 먼저 보여줄지 제안합니다. 확인되지 않은 수치·고객 경험·대규모 운영 경험을 만들어내지 않습니다.
 
-### 9. 조사 결과를 다음 실행에서 그대로 재현할 수 있습니다
+### 10. 조사 결과를 다음 실행에서 그대로 재현할 수 있습니다
 
 각 실행은 새 run 디렉터리에 고정됩니다.
 
@@ -141,7 +157,7 @@
 
 같은 raw와 같은 profile로 다시 빌드했을 때 행 identity와 집계가 같은지 확인할 수 있고, 이력서나 JD가 바뀌면 기존 리뷰가 자동으로 현재 판정인 척 승계되지 않습니다.
 
-### 10. Codex와 Claude Code가 같은 기준으로 일합니다
+### 11. Codex와 Claude Code가 같은 기준으로 일합니다
 
 공개 저장소 하나가 정본입니다.
 
@@ -161,6 +177,7 @@
 | 새 URL을 신규 공고로 간주 | 신규·재게시·기존 누락·마감·조건 변경을 분리 |
 | 회사명이 비슷하면 재무를 연결 | 법인 신원 2-of-4를 통과한 뒤에만 재무 귀속 |
 | 기술 핏만으로 지원 순위 결정 | 재무·통근·근무정책·전형·보상까지 AND 검토 |
+| 근거가 보이지 않는 종합점수 | Match·Opportunity·Confidence와 component·가중치·cap을 함께 공개 |
 | 미확인값을 추정하거나 좋은 쪽으로 해석 | `UNKNOWN`과 충돌 출처를 그대로 보존 |
 | 지원 여부와 입사 판단을 한 점수로 표현 | `PREPARE`와 `PASS/HOLD/NO_GO`를 분리 |
 | 조사 결과가 대화에서 사라짐 | raw·manifest·dashboard·audit로 재현 가능 |
@@ -194,6 +211,7 @@ PNG가 필요한 문서·메신저에서는 [`assets/workflow-overview.png`](ass
 | `raw/<source>.json` | 가공 전 source별 공고와 수집 증거 |
 | `reviewed/manual.json` | 상세 검토한 행의 exact fingerprint 판정 |
 | `reviewed/ledger.json` | 중복과 충돌을 정리한 리뷰 원장 |
+| `scored-review.json` | Match·Opportunity·Confidence, component, cap, 민감도 순위 |
 | `dist/manifest.json` | 수집량·중복·실패·coverage·review accounting 정본 |
 | `dist/jobs.js` | 전체 필터 대시보드용 compact payload |
 | `site/index.html` | 검색·출처·지역·경력·고용·coverage 필터 UI |
@@ -290,7 +308,7 @@ python3 scripts/validate_profile.py \
   --check-sources
 ```
 
-프로필에는 목표 직무, 증명된 강점, 명시적 공백, 학력·경력, 하드 제외 조건, 재무·채용 피로도 정책, 통근 또는 근무정책 기준, 이력서 원본 경로와 SHA만 기록합니다. 전화번호·개인 이메일·상세 집주소·채용담당자 정보·자격증명은 기록하지 않습니다.
+프로필에는 목표 직무, 증명된 강점, 명시적 공백, 학력·경력, 하드 제외 조건, 재무·채용 피로도 정책, 통근 또는 근무정책 기준, 점수 가중치·민감도 프로필, 이력서 원본 경로와 SHA만 기록합니다. 전화번호·개인 이메일·상세 집주소·채용담당자 정보·자격증명은 기록하지 않습니다.
 
 자세한 계약은 [`references/personalization.md`](references/personalization.md)를 참고하세요.
 
@@ -328,6 +346,17 @@ node scripts/run-census.mjs \
 
 자세한 절차는 [`references/review-workflow.md`](references/review-workflow.md)를 참고하세요.
 
+## 매칭 점수 계산
+
+```bash
+python3 scripts/score_review.py \
+  --input /absolute/review.json \
+  --profile ~/.config/realistic-job-market-research/profile.json \
+  --output /absolute/scored-review.json
+```
+
+입력 예시는 [`assets/score-review.example.json`](assets/score-review.example.json), 점수 연구·공식·기본 가중치는 [`references/scoring-model.md`](references/scoring-model.md)에 있습니다.
+
 ## 감사
 
 브라우저 QA까지 기록한 후:
@@ -346,6 +375,7 @@ node scripts/audit-run.mjs \
 npm test
 python3 scripts/validate_profile.py --self-test
 python3 scripts/validate_review.py --self-test
+python3 scripts/score_review.py --self-test
 node scripts/verify-reference-run.mjs \
   --run-dir /absolute/replayed-reference-run
 ```

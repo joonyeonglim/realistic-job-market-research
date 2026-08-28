@@ -21,9 +21,10 @@ Resolve supporting scripts from this skill directory, never from the user's proj
 4. For `review`, recheck every selected role on its current detail page. The exact body and source ID outrank title, tags, and search snippets.
 5. Extract mandatory and preferred requirements, duties, employment, exact location, work policy, compensation, deadline, and hiring steps. Use `UNKNOWN` when absent.
 6. Resolve employer identity before finance. Match every mandatory requirement to profile evidence as `confirmed`, `transferable`, `missing`, or `unknown`.
-7. Make two decisions: `PREPARE | CONDITIONAL | DROP` for application effort and `PASS | HOLD | NO_GO` for the employer or offer.
-8. Adversarially recheck leaders using [references/pitfalls.md](references/pitfalls.md), including degree floors, customer-facing work, language, mandatory frameworks, scale, hidden tests, stale finance, and founder-commitment signals.
-9. Produce coverage, shortlist, hard exclusions, corrections, claim-level sources, unknowns, and resume actions. Validate machine-readable output.
+7. Read [references/scoring-model.md](references/scoring-model.md), then calculate `JD Match Score`, `Opportunity Score`, and `Evidence Confidence` with `scripts/score_review.py`. Apply hard gates before weights and report sensitivity profiles.
+8. Make two decisions: `PREPARE | CONDITIONAL | DROP` for application effort and `PASS | HOLD | NO_GO` for the employer or offer. Scores inform these states but never replace them.
+9. Adversarially recheck leaders using [references/pitfalls.md](references/pitfalls.md), including degree floors, customer-facing work, language, mandatory frameworks, scale, hidden tests, stale finance, and founder-commitment signals.
+10. Produce coverage, scored shortlist, component scores, sensitivity changes, hard exclusions, corrections, claim-level sources, unknowns, and resume actions. Validate machine-readable output.
 
 ## Modes
 
@@ -39,6 +40,7 @@ Resolve supporting scripts from this skill directory, never from the user's proj
 - Preserve conflicting facts with both sources; do not average them.
 - Do not infer salary, work policy, degree requirements, finance, or hiring steps.
 - Do not express unsupported hiring probabilities as percentages. Use reasoned `high`, `medium`, or `low` fit labels.
+- Never present a score without its components, evidence confidence, model version, weights, and active caps.
 - Do not store recruiter names, emails, phone numbers, private messages, credentials, or confidential employer data.
 - Do not apply, save, message, edit a profile, or contact anyone without explicit authorization for that action.
 - Keep the final shortlist small. More rows are not a better result.
@@ -50,6 +52,7 @@ Resolve supporting scripts from this skill directory, never from the user's proj
 - [references/raw-schema.md](references/raw-schema.md) and [references/verification-gates.md](references/verification-gates.md) — read before build or audit claims.
 - [references/evidence-contract.md](references/evidence-contract.md) — read before finance, identity, status, or decision classification.
 - [references/review-schema.md](references/review-schema.md) — read when producing or validating machine-readable review JSON.
+- [references/scoring-model.md](references/scoring-model.md) — research basis, formulas, weights, caps, and sensitivity analysis.
 - [references/personalization.md](references/personalization.md) — local profile and public/private boundary.
 - [references/authenticated-sources.md](references/authenticated-sources.md) — read before any personalized browser source.
 - [references/pitfalls.md](references/pitfalls.md) — adversarial checks learned from failed scans.
