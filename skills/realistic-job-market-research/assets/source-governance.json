@@ -1,21 +1,36 @@
 {
   "schema_version": 1,
-  "policy_version": "2026-08-28-v1",
-  "notice": "This registry records collection controls, not legal permission. Every source remains review_required until its current terms and permitted use are documented.",
+  "policy_version": "2026-08-28-v2",
+  "notice": "This registry records collection controls, not legal advice. A parser or public page does not grant collection or redistribution rights.",
   "defaults": {
     "rights_status": "review_required",
     "terms_checked_at": null,
     "robots_checked_at": null,
     "retention": "private run only; do not redistribute raw bodies",
-    "user_agent": "realistic-job-market-research/1.1 (+https://github.com/joonyeonglim/realistic-job-market-research)",
+    "user_agent": "realistic-job-market-research/1.2 (+https://github.com/joonyeonglim/realistic-job-market-research)",
     "max_response_bytes": 10485760,
     "minimum_request_interval_ms": 1000
   },
   "collection_classes": {
-    "public_api_or_feed": ["wanted", "jumpit", "rallit", "groupby", "remoteok"],
-    "public_search_page": ["saramin", "career", "weworkremotely", "linkedin", "jobkorea", "incruit", "peoplenjob"],
+    "public_api_or_feed": ["wanted", "jumpit", "rallit", "groupby", "remoteok", "himalayas"],
+    "public_search_page": ["saramin", "career", "weworkremotely", "linkedin", "jobkorea", "incruit", "peoplenjob", "catch", "work24", "job_alio", "gojobs", "seoul_jobs", "seoul_public", "gyeonggi_public"],
+    "public_sitemap": ["robert_walters", "jac_korea"],
+    "public_recruitment_board": ["nst", "onest"],
+    "public_theme_page": ["jobaba"],
     "named_official_targets": ["official_ats"],
-    "probe_only": ["catch", "himalayas", "robert_walters", "jac_korea", "jobplanet", "rocketpunch", "work24", "job_alio", "gojobs", "nst", "onest", "jobaba", "seoul_jobs", "seoul_public", "gyeonggi_public"],
-    "authenticated_handoff": ["remember"]
+    "authenticated_handoff": ["jobplanet", "rocketpunch", "remember"]
+  },
+  "source_overrides": {
+    "himalayas": {
+      "rights_status": "allowed_public_api",
+      "terms_checked_at": "2026-08-28",
+      "robots_checked_at": "2026-08-28",
+      "attribution": "Display Himalayas as the source and preserve its job URL.",
+      "terms_url": "https://himalayas.app/docs/remote-jobs-api"
+    },
+    "rocketpunch": {
+      "robots_checked_at": "2026-08-28",
+      "content_signal": "search=yes, ai-train=no, use=reference"
+    }
   }
 }

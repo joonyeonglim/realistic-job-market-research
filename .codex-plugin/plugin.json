@@ -1,6 +1,6 @@
 {
   "name": "realistic-job-market-research",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Evidence-first job-posting audit and personalized role-ranking skill for Codex and Claude Code",
   "author": {"name": "Joonyeong Lim"},
   "skills": "./skills/",

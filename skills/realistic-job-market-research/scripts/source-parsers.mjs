@@ -18,6 +18,117 @@ export const parseCareer = value => {
   return [null, null];
 };
 
+export const htmlRows = html => [...String(html).matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map(match => match[1]);
+export const htmlCells = row => [...String(row).matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/gi)].map(match => textOnly(match[1]));
+
+export function parseSitemap(xml) {
+  return [...String(xml).matchAll(/<url>\s*<loc>([\s\S]*?)<\/loc>(?:[\s\S]*?<lastmod>([^<]+)<\/lastmod>)?[\s\S]*?<\/url>/gi)]
+    .map(match => ({ url: decodeHTML(match[1]).trim(), lastmod: match[2]?.trim() || null }));
+}
+
+export function parseRssItems(xml) {
+  const field = (item, name) => decodeHTML(item.match(new RegExp(`<${name}(?:\\s[^>]*)?>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?<\\/${name}>`, "i"))?.[1] || "").trim();
+  return [...String(xml).matchAll(/<item>([\s\S]*?)<\/item>/gi)].map(match => {
+    const item = match[1];
+    return {
+      title: field(item, "title"),
+      link: field(item, "link") || field(item, "guid"),
+      region: field(item, "region") || field(item, "country"),
+      category: field(item, "category"),
+      employment: field(item, "type"),
+      posted_at: field(item, "pubDate"),
+      description: textOnly(field(item, "description"))
+    };
+  }).filter(item => item.title && item.link);
+}
+
+export function titleFromJobUrl(url) {
+  const slug = decodeURIComponent(new URL(url).pathname.split("/").pop() || "")
+    .replace(/\.html$/i, "")
+    .replace(/^\d+-/, "")
+    .replace(/-\d{6,}$/, "")
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return slug || "UNKNOWN";
+}
+
+export function parseWork24Rows(html) {
+  const jobs = [];
+  for (const row of htmlRows(html)) {
+    const encoded = row.match(/name="idxs"[^>]*value="([^"]+)"/i)?.[1]
+      || row.match(/id="chkboxWantedAuthNo\d+"[^>]*value="([^"]+)"/i)?.[1];
+    const href = decodeHTML(row.match(/href="([^"]*wantedAuthNo=[^"]+)"/i)?.[1]);
+    if (!encoded || !href) continue;
+    const [sourceId, , company, title] = decodeHTML(encoded).split("|");
+    if (sourceId && company && title) jobs.push({ source_id: sourceId, company, title: textOnly(title), url: new URL(href, "https://www.work24.go.kr").href, review_text: textOnly(row) });
+  }
+  return jobs;
+}
+
+export function parseJobAlioRows(html) {
+  const jobs = [];
+  for (const row of htmlRows(html)) {
+    const sourceId = row.match(/name="idxs"[^>]*value="(\d+)"/i)?.[1];
+    const title = textOnly(row.match(/href="\/recruitview\.do\?idx=\d+"[^>]*\/?>([\s\S]*?)<\/a>/i)?.[1]);
+    const cells = htmlCells(row);
+    if (!sourceId || !title || cells.length < 8) continue;
+    jobs.push({ source_id: sourceId, title, company: cells[3] || "UNKNOWN", location: cells[4] || null, employment: cells[5] || null, posted_at: cells[6]?.replace(/\./g, "-") || null, deadline: cells[7]?.match(/\d{2}\.\d{2}\.\d{2}/)?.[0]?.replace(/\./g, "-") || null, status: cells[8] || "unknown", url: `https://job.alio.go.kr/recruitview.do?idx=${sourceId}` });
+  }
+  return jobs;
+}
+
+export function parseGojobsRows(html) {
+  const jobs = [];
+  for (const row of htmlRows(html)) {
+    const match = row.match(/<a[^>]+fn_apmView\('([^']+)',\s*'(\d+)'\)[^>]*>([\s\S]*?)<\/a>/i);
+    if (!match) continue;
+    const title = textOnly(match[3]);
+    const cells = htmlCells(row);
+    if (!title) continue;
+    jobs.push({ source_id: match[2], title, company: cells[2] || "UNKNOWN", posted_at: cells[3]?.replace(/\./g, "-") || null, deadline: cells[4]?.replace(/\./g, "-") || null, url: `https://www.gojobs.go.kr/apmView.do?searchJobsecode=${match[1]}&empmnsn=${match[2]}` });
+  }
+  return jobs;
+}
+
+export function parseNstRows(html, { key, bbsNo, defaultCompany }) {
+  const jobs = [];
+  for (const row of htmlRows(html)) {
+    const sourceId = row.match(/nttNo=(\d+)/)?.[1];
+    const title = textOnly(row.match(/<a[^>]+nttNo=\d+[^>]*>([\s\S]*?)<\/a>/i)?.[1]);
+    const cells = htmlCells(row);
+    if (!sourceId || !title) continue;
+    jobs.push({ source_id: sourceId, title, company: bbsNo === 19 ? (cells[1] || defaultCompany) : defaultCompany, posted_at: cells.at(-1) || null, url: `https://www.nst.re.kr/www/selectBbsNttView.do?key=${key}&bbsNo=${bbsNo}&nttNo=${sourceId}` });
+  }
+  return jobs;
+}
+
+export function parseSeoulPublicRows(html) {
+  const jobs = [];
+  for (const row of htmlRows(html)) {
+    const sourceId = row.match(/fnTbbsView\('(\d+)'\)/)?.[1];
+    const title = textOnly(row.match(/fnTbbsView\('\d+'\);"[^>]*>([\s\S]*?)<\/a>/i)?.[1]);
+    const cells = htmlCells(row);
+    if (!sourceId || !title || cells.length < 5) continue;
+    jobs.push({ source_id: sourceId, title, company: cells[2] || "서울특별시", posted_at: cells[3] || null, deadline: cells[4] || null, url: `https://www.seoul.go.kr/news/news_employ.do?bbsNo=166&nttNo=${sourceId}` });
+  }
+  return jobs;
+}
+
+export function parseSeoulJobsRows(html) {
+  const jobs = [];
+  for (const row of htmlRows(html)) {
+    const sourceId = row.match(/wantedAuthNo=([A-Za-z0-9]+)/)?.[1];
+    const href = decodeHTML(row.match(/href="([^"]*wantedAuthNo=[^"]+)"/i)?.[1]);
+    const title = textOnly(row.match(/wantedAuthNo=[^>]+>([\s\S]*?)<\/a>/i)?.[1]);
+    const cells = htmlCells(row);
+    if (!sourceId || !href || !title || cells.length < 4) continue;
+    const detail = textOnly(row);
+    jobs.push({ source_id: sourceId, title, company: cells[0] || "UNKNOWN", location: detail.match(/\(\d{5}\)\s*([^·]+?)(?=경력조건|등록일|마감일)/)?.[1]?.trim() || null, career_text: detail.match(/경력조건\s*:\s*([^·]+?)(?=등록일|마감일|$)/)?.[1]?.trim() || null, posted_at: cells[2] || null, deadline: cells[3]?.match(/\d{2}-\d{2}-\d{2}/)?.[0] || null, url: new URL(href, "https://job.seoul.go.kr").href });
+  }
+  return jobs;
+}
+
 export function parseSaraminCards(html, query, capturedAt) {
   const parsed = [...String(html).matchAll(/<div class="item_recruit"[\s\S]*?(?=<div class="item_recruit"|$)/g)].map(match => {
     const card = match[0];

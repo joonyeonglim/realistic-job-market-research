@@ -83,6 +83,25 @@ function save(source, payload) {
   console.error(`${source}: ${payload.jobs.length.toLocaleString("en-US")} unique rows -> ${file}`);
 }
 
+async function attempt(source, collector) {
+  try {
+    await collector();
+  } catch (error) {
+    const entry = planBySource.get(source);
+    const file = path.resolve(runDir, entry.output_path);
+    if (fs.existsSync(file)) throw error;
+    save(source, ledgerPayload(source, entry.scope, [], {
+      captured_at: collectedAt,
+      fetched_rows: 0,
+      completeness: "failed",
+      scope_kind: entry.queries.length ? "query" : "public_surface",
+      pagination: { method: entry.pagination.method, page_size: entry.pagination.page_size, requests: [{ error: error.message }], termination: entry.pagination.termination },
+      inputs: entry.expected_inputs.map(input => ({ ...input, captured_at: collectedAt })),
+      limits: [`collector failed: ${error.message}`]
+    }));
+  }
+}
+
 async function collectWanted() {
   const headers = { "wanted-user-country": "KR", "wanted-user-language": "ko", "user-agent": "Mozilla/5.0" };
   const pages = [];
@@ -424,10 +443,10 @@ function importSnapshots() {
 const allowed = new Set([...planBySource.keys(), ...stableSources, "all", "snapshot"]);
 for (const phase of phases) if (!allowed.has(phase)) throw new Error(`unknown --phase ${phase}`);
 
-if (selected.has("wanted")) await collectWanted();
-if (selected.has("saramin")) await collectSaramin();
-if (selected.has("jumpit")) await collectJumpit();
-if (selected.has("rallit")) await collectRallit();
+if (selected.has("wanted")) await attempt("wanted", collectWanted);
+if (selected.has("saramin")) await attempt("saramin", collectSaramin);
+if (selected.has("jumpit")) await attempt("jumpit", collectJumpit);
+if (selected.has("rallit")) await attempt("rallit", collectRallit);
 const imported = importSnapshots();
 const requiredSnapshotSources = plan.sources
   .filter(entry => entry.expected_inputs.some(input => input.kind === "imported_snapshot") && (phases.has("all") || phases.has("snapshot") || phases.has(entry.source)))

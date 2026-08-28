@@ -164,7 +164,7 @@ def sample() -> dict:
     return {
         "schema_version": 1,
         "profile_version": "example-v1",
-        "captured_at": "2030-01-15T00:00:00Z",
+        "captured_at": "2000-01-15T00:00:00Z",
         "career_years": 6.0,
         "candidate": {
             "target_roles": ["Applied AI Engineer"],
@@ -177,7 +177,7 @@ def sample() -> dict:
             "model_version": "2026-08-v3",
             "policy_source": "assets/scoring-policy.default.json",
             "weight_method": "owner_policy_provisional",
-            "elicited_at": "2030-01-15",
+            "elicited_at": "2000-01-15",
             "rationale": "Synthetic test policy",
             "match_weights": {"mandatory_requirements": 45, "task_ownership": 20, "production_delivery": 15, "preferred_requirements": 8, "level_scope": 8, "domain_onboarding": 4},
             "opportunity_weights": {"match_score": 45, "finance": 25, "location_work_policy": 12, "hiring_process": 8, "compensation_level": 10},

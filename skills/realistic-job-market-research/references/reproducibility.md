@@ -2,7 +2,7 @@
 
 ## Public synthetic reference
 
-The public repository contains a rights-safe 29-source synthetic transformation fixture. It emits one row for each of the 13 implemented adapters and zero rows for 15 probes plus one authenticated handoff.
+The public repository contains a rights-safe 29-source synthetic transformation fixture. It emits one row for each of the 26 automated adapters and zero rows for the three owner-browser handoffs.
 
 ```bash
 npm run reference

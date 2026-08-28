@@ -40,9 +40,8 @@ A failure stays in the current state with `HOLD` and an exact reason. Chat claim
 1. Main session partitions the registry into non-overlapping source assignments.
 2. Each collector writes only its assigned source. It writes a sibling
    `<output>.tmp-<pid>`, validates it, then atomically renames it to the planned output.
-   Public collection uses HTTP/API/search and never a browser.
-3. Login or personalized surfaces return `AUTH_REQUIRED`; the main session checks the owner-configured
-   browser profile, lets the owner log in, and performs read-only collection.
+   Automated collection uses HTTP/API/search/sitemaps and never impersonates an authenticated browser.
+3. Jobplanet, RocketPunch, and Remember use the owner-configured browser. The owner handles login; the agent performs read-only collection and writes `imports/<source>.json` using `assets/browser-export.example.json`.
 4. Main session integrates only after all assigned sources have a terminal attempt state. `failed` remains
    visible and cannot silently fall back to an older file.
 5. Run a read-only ledger audit over raw and dist without editing them.
@@ -54,8 +53,7 @@ Canonical commands are:
 
 - `scripts/init-run.mjs` — freeze the 29-source registry, local profile, and named official targets;
 - `scripts/collect-raw-ledgers.mjs` — complete adapters for Wanted, Saramin, Jumpit, and Rallit;
-- `scripts/collect-extended-sources.mjs` — GroupBy, Career, RemoteOK, WWR, LinkedIn, JobKorea,
-  Incruit, official ATS, Peoplenjob, and explicit terminal artifacts for remaining sources;
+- `scripts/collect-extended-sources.mjs` — all other automated sources plus validated owner-browser imports for Jobplanet, RocketPunch, and Remember;
 - `scripts/sync-source-plan.mjs` — bind every attempt state to the immutable raw snapshot;
 - `scripts/build-ledger.mjs` — optional reviewed-label join;
 - `scripts/build-census.mjs` and `scripts/build-dashboard.mjs` — manifest, payload, and static site;
@@ -67,6 +65,8 @@ From the installed skill root:
 ```bash
 node scripts/run-census.mjs --run-dir /absolute/path/to/YYYY-MM-DD-scope-census --acknowledge-source-policy
 ```
+
+If a browser handoff is missing, the run keeps a zero-row `blocked` artifact. Add the validated export under `imports/` and rerun that source in a fresh `-r2` run; never delete or overwrite the blocked evidence.
 
 ## 4. Artifact transitions
 

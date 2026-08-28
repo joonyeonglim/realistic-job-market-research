@@ -348,7 +348,7 @@ def sample_document() -> dict:
     url = "https://example.com/jobs/agent-engineer"
     return {
         "schema_version": 1,
-        "as_of": "2030-01-15",
+        "as_of": "2000-01-15",
         "candidate_profile_version": "example-v1",
         "scope": {
             "kind": "named_shortlist",

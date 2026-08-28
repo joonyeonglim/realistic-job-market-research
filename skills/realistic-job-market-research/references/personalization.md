@@ -26,7 +26,7 @@ Do not include phone numbers, personal email, exact home address, recruiter deta
 Validate before a run:
 
 ```bash
-python3 scripts/validate_profile.py ~/.config/realistic-job-market-research/profile.json --check-sources
+node scripts/python-runner.mjs scripts/validate_profile.py ~/.config/realistic-job-market-research/profile.json --check-sources
 ```
 
 Raw census initialization works without a profile. Review queues, personalized decisions, and scoring fail closed until a valid profile is supplied.
