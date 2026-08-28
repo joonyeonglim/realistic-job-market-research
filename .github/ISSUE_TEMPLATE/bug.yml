@@ -1,0 +1,21 @@
+name: Bug report
+description: Report a reproducible collector, scoring, installation, or audit defect.
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: textarea
+    attributes:
+      label: Reproduction
+      description: Include commands, versions, source key, and sanitized output. Never include credentials or personal profile data.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected and observed result
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Commit or release
+    validations:
+      required: true

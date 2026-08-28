@@ -1,0 +1,9 @@
+interface:
+  display_name: "Realistic Job Market Research"
+  short_description: "Audit public job postings and rank evidence-backed opportunities"
+  icon_small: "./assets/icon-small.svg"
+  icon_large: "./assets/icon-large.png"
+  brand_color: "#087F6B"
+  default_prompt: "Use $realistic-job-market-research to collect or review current openings against my local profile and produce an audited, evidence-backed shortlist."
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "kind": "synthetic_public_fixture",
+  "total_source_rows": 13,
+  "source_attempt_counts": {"attempted": 29, "row_producing": 13, "complete": 0, "partial": 13, "blocked": 16, "failed": 0},
+  "source_adapter_counts": {"implemented": 13, "probe_only": 15, "authenticated_handoff": 1}
+}

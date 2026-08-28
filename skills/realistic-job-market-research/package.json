@@ -1,0 +1,20 @@
+{
+  "name": "realistic-job-market-research-skill",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Cross-agent skill for audited job-market census and personalized realistic review",
+  "license": "MIT",
+  "repository": "github:joonyeonglim/realistic-job-market-research",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node scripts/package-self-test.mjs",
+    "qa": "node scripts/record-qa.mjs",
+    "reference": "node scripts/verify-public-reference.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

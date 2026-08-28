@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "elicited_at": "2000-01-01",
+  "method": "swing_weighting",
+  "criteria": {
+    "match_score": {"raw_weight": 100, "rationale": "Largest meaningful best-to-worst swing."},
+    "finance": {"raw_weight": 56, "rationale": "Material employer-risk swing."},
+    "location_work_policy": {"raw_weight": 27, "rationale": "Meaningful recurring commute swing."},
+    "hiring_process": {"raw_weight": 18, "rationale": "One-time effort swing."},
+    "compensation_level": {"raw_weight": 22, "rationale": "Offer-stage value swing; often unknown before application."}
+  }
+}

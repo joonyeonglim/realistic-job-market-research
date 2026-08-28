@@ -1,13 +1,9 @@
 {
-  "name": "realistic-job-market-research-skill",
-  "version": "1.0.0",
+  "name": "realistic-job-market-research-repo",
+  "version": "1.1.0",
   "private": true,
-  "description": "Cross-agent skill for audited job-market census and personalized realistic review",
-  "type": "module",
-  "engines": {
-    "node": ">=20"
-  },
+  "workspaces": ["skills/realistic-job-market-research"],
   "scripts": {
-    "test": "node scripts/package-self-test.mjs"
+    "test": "npm test --workspace realistic-job-market-research-skill"
   }
 }

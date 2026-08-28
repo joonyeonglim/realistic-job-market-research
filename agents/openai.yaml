@@ -1,4 +1,0 @@
-interface:
-  display_name: "Realistic Job Market Research"
-  short_description: "Collect, audit, and realistically rank live job openings"
-  default_prompt: "Use $realistic-job-market-research to collect or review current openings against my local profile and produce an audited, evidence-backed shortlist."

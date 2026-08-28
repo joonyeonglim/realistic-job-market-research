@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "model_version": "2026-08-v3",
+  "mandatory_aggregation": "minimum",
+  "match_weights": {
+    "mandatory_requirements": 45,
+    "task_ownership": 20,
+    "production_delivery": 15,
+    "preferred_requirements": 8,
+    "level_scope": 8,
+    "domain_onboarding": 4
+  },
+  "opportunity_weights": {
+    "match_score": 45,
+    "finance": 25,
+    "location_work_policy": 12,
+    "hiring_process": 8,
+    "compensation_level": 10
+  },
+  "match_values": {"confirmed": 100, "transferable": 55, "missing": 0, "unknown": 0},
+  "axis_values": {
+    "finance": {"A": 100, "B": 75, "C": 35, "D": 0, "UNVERIFIED": 0},
+    "location_work_policy": {"good": 100, "acceptable": 65, "poor": 20, "unknown": 0},
+    "hiring_process": {"F0": 100, "F1": 80, "F2": 55, "F3": 20, "UNKNOWN": 0},
+    "compensation_level": {"good": 100, "acceptable": 65, "poor": 20, "unknown": 0}
+  },
+  "caps": {
+    "mandatory_missing_match": 59,
+    "mandatory_unknown_match": 74,
+    "hard_gate_opportunity": 0,
+    "mandatory_missing_opportunity": 49,
+    "ambiguous_status_opportunity": 59
+  },
+  "bands": {
+    "match": [[85, "STRONG"], [70, "SOLID"], [55, "CONDITIONAL"], [0, "WEAK"]],
+    "opportunity": [[80, "HIGH_PRIORITY"], [65, "VIABLE"], [50, "CONDITIONAL"], [0, "LOW"]],
+    "coverage": [[85, "HIGH"], [70, "USABLE"], [50, "THIN"], [0, "INSUFFICIENT"]]
+  },
+  "coverage_points": {
+    "posting_status_verified": 10,
+    "mandatory_evidence_resolved": 25,
+    "preferred_evidence_resolved": 5,
+    "fit_dimensions_resolved": 15,
+    "company_identity_confirmed": 10,
+    "finance_verified": 10,
+    "location_work_policy_known": 10,
+    "hiring_process_known": 8,
+    "compensation_confirmed": 7
+  },
+  "confidence_threshold": 70,
+  "sensitivity_profiles": {
+    "fit_first": {"match_score": 60, "finance": 15, "location_work_policy": 8, "hiring_process": 7, "compensation_level": 10},
+    "stability_first": {"match_score": 35, "finance": 35, "location_work_policy": 10, "hiring_process": 8, "compensation_level": 12},
+    "low_friction": {"match_score": 40, "finance": 20, "location_work_policy": 15, "hiring_process": 15, "compensation_level": 10}
+  },
+  "robustness": {"seed": 20260828, "samples": 10000, "weight_multiplier_min": 0.5, "weight_multiplier_max": 1.5},
+  "rounding": "ROUND_HALF_UP",
+  "ranking": {"application_stage": "PREPARE", "mandatory_states": ["confirmed", "transferable"], "coverage_minimum": 70}
+}

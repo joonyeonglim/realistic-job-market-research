@@ -1,0 +1,16 @@
+{
+  "name": "realistic-job-market-research",
+  "version": "1.1.0",
+  "description": "Evidence-first job-posting audit and personalized role-ranking skill for Codex and Claude Code",
+  "author": {"name": "Joonyeong Lim"},
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Realistic Job Market Research",
+    "shortDescription": "Audit public job postings and rank evidence-backed opportunities.",
+    "longDescription": "Builds a lossless job-market ledger, preserves collection failures, verifies exact job and employer evidence, and produces transparent personalized Match, Opportunity, Evidence Coverage, and Evidence Quality results.",
+    "developerName": "Joonyeong Lim",
+    "category": "Productivity",
+    "capabilities": ["Skills"],
+    "defaultPrompt": "Use $realistic-job-market-research to audit the declared job sources or review a named shortlist against my private local profile."
+  }
+}

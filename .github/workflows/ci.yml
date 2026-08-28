@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.10"
+      - run: npm ci
+      - run: npm test
+      - run: npm audit --audit-level=high
+      - run: npx -y skills-ref validate skills/realistic-job-market-research
+      - run: python3 -m py_compile skills/realistic-job-market-research/scripts/*.py
+
+  compatibility:
+    name: compatibility
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.13"
+      - run: npm ci
+      - run: npm test
+
+  browser-qa:
+    name: browser-qa
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Create synthetic run
+        run: |
+          echo "RUN_DIR=$(mktemp -d)" >> "$GITHUB_ENV"
+      - run: node skills/realistic-job-market-research/scripts/create-public-fixture.mjs --run-dir "$RUN_DIR"
+      - run: node skills/realistic-job-market-research/scripts/record-qa.mjs --run-dir "$RUN_DIR"
+      - run: node skills/realistic-job-market-research/scripts/audit-run.mjs --run-dir "$RUN_DIR" --qa "$RUN_DIR/qa-evidence.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: synthetic-qa
+          path: |
+            ${{ env.RUN_DIR }}/qa-evidence.json
+            ${{ env.RUN_DIR }}/audit.json
+            ${{ env.RUN_DIR }}/qa/*.png

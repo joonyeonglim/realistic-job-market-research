@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "policy_version": "2026-08-28-v1",
+  "notice": "This registry records collection controls, not legal permission. Every source remains review_required until its current terms and permitted use are documented.",
+  "defaults": {
+    "rights_status": "review_required",
+    "terms_checked_at": null,
+    "robots_checked_at": null,
+    "retention": "private run only; do not redistribute raw bodies",
+    "user_agent": "realistic-job-market-research/1.1 (+https://github.com/joonyeonglim/realistic-job-market-research)",
+    "max_response_bytes": 10485760,
+    "minimum_request_interval_ms": 1000
+  },
+  "collection_classes": {
+    "public_api_or_feed": ["wanted", "jumpit", "rallit", "groupby", "remoteok"],
+    "public_search_page": ["saramin", "career", "weworkremotely", "linkedin", "jobkorea", "incruit", "peoplenjob"],
+    "named_official_targets": ["official_ats"],
+    "probe_only": ["catch", "himalayas", "robert_walters", "jac_korea", "jobplanet", "rocketpunch", "work24", "job_alio", "gojobs", "nst", "onest", "jobaba", "seoul_jobs", "seoul_public", "gyeonggi_public"],
+    "authenticated_handoff": ["remember"]
+  }
+}
