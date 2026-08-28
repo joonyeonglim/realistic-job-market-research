@@ -5,19 +5,19 @@
   "records": [
     {
       "role_key": "sha256:synthetic-role-1",
-      "scored_at": "2030-01-15T00:00:00Z",
+      "scored_at": "2000-01-15T00:00:00Z",
       "opportunity_score": 84.9,
       "opportunity_band": "HIGH_PRIORITY",
       "outcome": "interview",
-      "outcome_recorded_at": "2030-02-01T00:00:00Z"
+      "outcome_recorded_at": "2000-02-01T00:00:00Z"
     },
     {
       "role_key": "sha256:synthetic-role-2",
-      "scored_at": "2030-01-15T00:00:00Z",
+      "scored_at": "2000-01-15T00:00:00Z",
       "opportunity_score": 60.0,
       "opportunity_band": "CONDITIONAL",
       "outcome": "no_response",
-      "outcome_recorded_at": "2030-02-15T00:00:00Z"
+      "outcome_recorded_at": "2000-02-15T00:00:00Z"
     }
   ]
 }

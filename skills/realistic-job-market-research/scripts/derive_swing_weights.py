@@ -51,7 +51,7 @@ def derive(document: object) -> dict:
 
 
 def self_test() -> int:
-    document = {"schema_version": 1, "method": "swing_weighting", "elicited_at": "2030-01-01", "criteria": {key: {"raw_weight": value, "rationale": key} for key, value in zip(CRITERIA, (100, 50, 25, 15, 10))}}
+    document = {"schema_version": 1, "method": "swing_weighting", "elicited_at": "2000-01-01", "criteria": {key: {"raw_weight": value, "rationale": key} for key, value in zip(CRITERIA, (100, 50, 25, 15, 10))}}
     result = derive(document)
     assert abs(sum(result["opportunity_weights"].values()) - 100) < 1e-9
     assert result["opportunity_weights"]["match_score"] == 50

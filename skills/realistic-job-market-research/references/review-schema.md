@@ -1,6 +1,6 @@
 # Review JSON Schema
 
-`scripts/validate_review.py` validates this contract with the Python standard library.
+`node scripts/python-runner.mjs scripts/validate_review.py` validates this contract and provisions Python automatically when needed.
 
 ## Root
 

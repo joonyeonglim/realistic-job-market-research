@@ -2,6 +2,10 @@
   "schema_version": 1,
   "sensitive_key_pattern": "(?:^|_)(?:api_?key|access_?token|refresh_?token|secret|password|passwd|cookie|authorization|credential|private_?key|email|phone|mobile|home_?address)(?:$|_)",
   "sensitive_query_key_pattern": "^(?:token|access_token|refresh_token|api_key|key|secret|signature|sig|auth|authorization|password)$",
+  "public_query_key_exceptions": [
+    {"hostname": "www.nst.re.kr", "path": "/www/selectBbsNttView.do", "key": "key", "value_pattern": "^\\d+$"},
+    {"hostname": "www.kisdi.re.kr", "path": "/bbs/view.do", "key": "key", "value_pattern": "^m\\d+$"}
+  ],
   "content_patterns": [
     {"name": "email address", "pattern": "[\\w.+-]+@[\\w.-]+\\.[A-Za-z]{2,}", "flags": "i"},
     {"name": "phone number", "pattern": "(?:\\+82[- ]?1[016789][- ]?\\d{3,4}[- ]?\\d{4}|01[016789][ -]\\d{3,4}[ -]\\d{4})", "flags": ""},

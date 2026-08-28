@@ -51,11 +51,15 @@ const serialized = JSON.stringify({ safeManifest, safePayload });
 const privacyPolicy = readJSON(path.join(root, "assets", "privacy-patterns.json"));
 const sensitive = privacyPolicy.content_patterns.map(item => new RegExp(item.pattern, item.flags));
 const sensitiveQuery = new RegExp(privacyPolicy.sensitive_query_key_pattern, "i");
+const publicQueryExceptions = (privacyPolicy.public_query_key_exceptions || []).map(item => ({ ...item, value: new RegExp(item.value_pattern) }));
 if (sensitive.some(pattern => pattern.test(serialized))) throw new Error("sensitive content detected; export refused");
 for (const row of safePayload.rows) {
   const url = String(row[safeManifest.schema.indexOf("url")] || "");
   const parsed = new URL(url);
-  for (const key of parsed.searchParams.keys()) if (sensitiveQuery.test(key)) throw new Error(`sensitive URL query parameter detected: ${key}`);
+  for (const key of parsed.searchParams.keys()) {
+    const allowed = publicQueryExceptions.some(item => item.hostname === parsed.hostname && item.path === parsed.pathname && item.key === key && item.value.test(parsed.searchParams.get(key) || ""));
+    if (sensitiveQuery.test(key) && !allowed) throw new Error(`sensitive URL query parameter detected: ${key}`);
+  }
 }
 
 const stage = `${output}.staging-${process.pid}`;

@@ -2,28 +2,28 @@
 
 ## Verdict
 
-**READY for the declared v1.1 contract: 13 implemented collectors, 15 access probes, and one authenticated handoff.**
+**READY for the declared v1.2 contract: 26 automated collectors and 3 owner-browser handoffs cover all 29 registered sources.**
 
 **HOLD** for four broader claims that the repository cannot honestly make:
 
-1. all 29 registered sources produced collected postings;
-2. current terms or redistribution rights are approved for every source;
+1. current terms or redistribution rights are approved for every non-Himalayas source;
+2. Jobplanet, RocketPunch, and Remember can be collected without an owner-controlled browser;
 3. the matching score predicts application, interview, or offer probability;
 4. the external `skills` CLI updates an installed skill atomically.
 
-The public promise, machine registry, runtime, examples, README, plugin manifest, and audit output now use the same capability boundary. A probe is an access attempt, not a parser and not a recovered posting.
+The public promise, machine registry, runtime, examples, README, plugin manifest, and audit output now use the same capability boundary. The registry has no probe-only source.
 
 ## Measured contract
 
 | Measure | Current result | Source of truth |
 |---|---:|---|
 | Registered sources | 29 | `assets/source-registry.json` |
-| Implemented collectors/parsers | 13 | `adapter_inventory.implemented` + dispatch self-test |
-| Access probes | 15 | `adapter_inventory.probe_only` |
-| Authenticated handoff | 1 | `adapter_inventory.authenticated_handoff` |
+| Automated collectors/parsers | 26 | `adapter_inventory.implemented` + dispatch self-test |
+| Access probes | 0 | `adapter_inventory.probe_only` |
+| Owner-browser handoffs | 3 | Jobplanet, RocketPunch, Remember |
 | Ledger audit gates | 14 | `scripts/audit-run.mjs` |
 | Dashboard audit gates | 8 | `scripts/audit-run.mjs` |
-| Public synthetic rows | 13 | one rights-safe row per implemented adapter |
+| Public synthetic rows | 26 | one rights-safe row per automated adapter |
 | Robustness perturbations | 10,000 | scoring policy `2026-08-v3` |
 | Generated input schemas | 3 | profile, review, and QA evidence |
 | Private historical replay | 29,469 rows | owner attestation; raw bodies are not redistributed |
@@ -37,13 +37,39 @@ The machine-readable owners are:
 - generated schemas: [`schemas/`](skills/realistic-job-market-research/schemas/);
 - human explanation: links to those files rather than independent constants.
 
+### Live promotion proof
+
+Current public endpoints were exercised on 2026-08-28 with the repository rate, body, redirect, MIME, and SSRF controls. Counts are observations, not permanent market totals.
+
+| Newly automated source | Rows | Verdict | Boundary |
+|---|---:|---|---|
+| Catch | 508 | `complete_query` | API-reported totals matched |
+| Himalayas | 1,003 | `partial` | 200 rows/query, attribution and backlink required |
+| Robert Walters Korea | 5 | `partial` | AI-relevant public sitemap URLs; detail identity still reviewed |
+| JAC Recruitment Korea | 1 | `partial` | AI-relevant English public sitemap URLs |
+| Work24 | 113 | `complete_query` | declared title queries exhausted |
+| JOB-ALIO | 4 | `complete_query` | current in-progress title queries exhausted |
+| 나라일터 | 372 | `complete_query` | provider-reported pages exhausted |
+| NST council board | 3 | `complete_query` | five title queries exhausted |
+| NST institute board / ONEST successor | 0 | `complete_query` | valid zero result, not a failed collector |
+| 잡아바 AI-big-data theme | 30 | `complete_surface` | provider-reported theme count matched |
+| Seoul Job Portal | 95 | `complete_query` | six keyword queries exhausted |
+| Seoul recruitment notices | 1 | `complete_query` | current-open queries exhausted |
+| Gyeonggi public jobs | 6 | `complete_query` | provider-reported query counts matched |
+
+Jobplanet, RocketPunch, and Remember are tested `main_chrome` imports. Absence of an owner export yields an explicit zero-row `blocked` artifact rather than a fake success.
+
+The first all-source run exposed two pre-existing adapters: Career exceeded the 10 MiB page limit and WWR search HTML returned 403. The corrected paths recovered Career 141 rows as `complete_query` with 10-row bounded pages and WWR 88 rows as `partial` from its official RSS feed. No access control was bypassed.
+
+Final all-source integration after those fixes: 32,286 rows, 29 attempted, 25 row-producing, 16 complete, 10 partial, 3 owner-browser blocked, and **0 failed**. Ledger and dashboard audits PASS; Chromium loaded the full dashboard in 635 ms, reported zero console errors, and had zero horizontal overflow at 390 px.
+
 ## Remediation status
 
 ### P0 — truth, privacy, network, QA, and distribution
 
 | Original gap | Status | Implemented boundary |
 |---|---|---|
-| 29-source promise exceeded implementation | **DONE** | Registry and dispatcher agree on `13 / 15 / 1`; README and manifest expose the split. |
+| 29-source promise exceeded implementation | **DONE** | Registry and dispatcher agree on `26 automated / 3 browser`; README and manifest expose the split. |
 | Census required a private profile | **DONE** | Raw census is profile-free; `init-profile.mjs` creates current private configuration only for review/score. |
 | Installed `SKILL.md` could briefly disappear during update | **MITIGATED** | `doctor.mjs`, clean-install tests, and update-outside-active-session instructions ship. Atomic replacement remains upstream. |
 | Free-text profile could leak PII or secrets | **DONE** | Typed allowlists, shared privacy patterns, `0600` files, private run defaults, `.gitignore`, and sanitized export gate. |
@@ -68,7 +94,7 @@ The machine-readable owners are:
 | Ledger-to-review handoff was manual and lossy | **DONE** | Deterministic queue carries source identity and fingerprint and refuses unresolved facts. |
 | Profile/review/QA contracts were prose-only | **DONE FOR AUTHOR INPUTS** | Generated schemas and drift test cover the three author-supplied trust boundaries; generated outputs stay owned by executable builders/auditors rather than duplicate schemas. |
 | Source parsers duplicated common decoding | **DONE FOR SHARED PATH** | Common decoding, text normalization, career parsing, and Saramin parsing live in `source-parsers.mjs`. |
-| Every source lacked a legally shareable fixture/canary | **RIGHTS HOLD** | Synthetic transformation fixtures and parser self-tests ship. Live/sanitized per-source fixtures wait for current permission and captured rights-safe samples. |
+| Every source lacked a legally shareable fixture/canary | **DONE FOR STRUCTURE / RIGHTS HOLD FOR RAW** | Source-specific synthetic parser tests ship. Third-party raw bodies remain private. |
 | Network recovery and concurrent writers were unsafe | **DONE FOR CURRENT THROUGHPUT** | Per-host throttle/retry, immutable per-source outputs, partial-state preservation, and exclusive run lock. No distributed lease is claimed. |
 | Registry was hard-coded to exactly 29 | **DONE** | Unique semantic registry validation replaces the magic count; current count is derived. |
 | Score had no outcome validation | **INSTRUMENTATION DONE / EVIDENCE HOLD** | Frozen outcome evaluator refuses calibration claims below 30 outcomes and five positive outcomes. Scores remain decision policy, not probability. |
@@ -79,13 +105,20 @@ The machine-readable owners are:
 |---|---|
 | OpenAI plugin manifest | **DONE** — `.codex-plugin/plugin.json` validates and points to `skills/`. |
 | Codex/Claude metadata parity | **DONE** — one canonical `SKILL.md`; icons, brand color, prompt, license, and compatibility are wired. |
-| Version and changelog | **DONE** — repository and skill package are `1.1.0`. |
+| Version and changelog | **DONE** — repository and skill package are `1.2.0`. |
 | English entrypoint | **DONE** — `README.en.md`. |
 | Runtime install size | **DONE** — documentation imagery lives in root `media/`; only runtime icons install with the skill. |
 | Governance files | **DONE** — security, contribution, issue/PR templates, Dependabot, and CODEOWNERS. |
 | Public share image | **DONE** — 1280×640 custom repository preview with live Open Graph readback. |
 | GitHub Wiki duplication | **REMOVED** — versioned repository documentation is canonical. |
 | npm wording | **DONE** — docs state that `npx skills add` invokes the Skills CLI; this repository is not an npm-published runtime package. |
+
+## Runtime bootstrap boundary
+
+- Existing Node.js 20+ users keep the standard `npx skills add` path.
+- `install.sh` and `install.ps1` provision the official Node v24 archive in the user cache, verify its SHA-256, and run the same Skills CLI command without changing the system PATH.
+- Python commands route through `python-runner.mjs`. It uses an existing Python 3.10+ or installs pinned `uv` plus managed Python 3.12 in the user cache.
+- The collectors and score model keep their existing language implementations; runtime automation does not duplicate the scoring formula.
 
 ## Installation warning — exact boundary
 
@@ -120,7 +153,7 @@ Languages: Korean primary README plus English quickstart.
 | Lens | Status | Evidence and boundary |
 |---|---|---|
 | SEO | **IMPLEMENTATION PASS** | Public GitHub route returns 200; repository name, description, topics, first-screen answer, headings, internal links, and share image are aligned. GitHub owns canonical, robots, sitemap, and HTML metadata. |
-| AEO | **IMPLEMENTATION PASS** | The first screen directly states what the skill is, for whom, what it produces, and the `13 / 15 / 1` boundary; formulas, evidence rules, dates, and limitations are adjacent to claims. |
+| AEO | **IMPLEMENTATION PASS** | The first screen directly states what the skill is, for whom, what it produces, and the `26 automated / 3 browser` boundary; formulas, evidence rules, dates, and limitations are adjacent to claims. |
 | GEO | **IMPLEMENTATION PASS / PLATFORM BOUNDARY** | GitHub's public route is crawlable under its host policy and exposes server-rendered README text. This repository does not claim control over GitHub WAF or crawler policy. |
 | LLMO | **IMPLEMENTATION PASS / OUTCOME UNKNOWN** | Canonical English entity description is synchronized across README, repository metadata, plugin metadata, and skill entrypoint. Model recall is not yet evidence. |
 | NEO | **PLATFORM HOLD** | GitHub controls Yeti access, sitemap, canonical, and IndexNow. No Search Advisor property or Naver citation evidence is claimed. |
@@ -132,7 +165,7 @@ Search ranking, index inclusion, and AI citation are not guaranteed by implement
 ## Remaining HOLDs and the evidence that closes each
 
 1. **Source rights:** record current terms, robots check, permitted purpose, rate, retained fields, and redistribution rule for a source. Only then change its `rights_status`.
-2. **Probe promotion:** implement the parser, add a rights-safe fixture and drift test, and prove row accounting. Only then move the source from `probe_only` to `implemented` in the registry SSOT.
+2. **Browser handoff:** Jobplanet, RocketPunch, and Remember require an owner-controlled browser export. Access controls are never bypassed or relabeled as automated collection.
 3. **Owner weights:** complete swing elicitation and version the reason. Until then keep `owner_policy_provisional` visible.
 4. **Outcome validity:** collect at least 30 frozen pre-application outcomes with at least five positives, then report discrimination/association and error analysis. Do not convert this to a hiring probability without stronger evidence.
 5. **Search outcome:** use actual Search Console/Search Advisor/referral/clickable-source data after the follow-up windows. A one-off `site:` query or model recall is not proof.

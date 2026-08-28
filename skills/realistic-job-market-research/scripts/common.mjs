@@ -335,7 +335,7 @@ export function loadSourcePlan(runDir, file = path.join(runDir, "source-plan.jso
     seen.add(entry.source);
     for (const key of ["producer", "expected_inputs", "access_mode", "adapter_status", "scope", "queries", "pagination", "output_path", "minimum_captured_at", "attempt_status"]) if (entry[key] === undefined) throw new Error(`${file}: sources[${index}].${key} is required`);
     if (!["implemented", "probe_only", "authenticated_handoff"].includes(entry.adapter_status)) throw new Error(`${file}: invalid adapter_status for ${entry.source}`);
-    if (!entry.governance || entry.governance.rights_status !== "review_required" || !entry.governance.collection_class || !Number.isInteger(entry.governance.minimum_request_interval_ms) || entry.governance.minimum_request_interval_ms < 250) throw new Error(`${file}: invalid governance contract for ${entry.source}`);
+    if (!entry.governance || !["review_required", "allowed_public_api", "blocked"].includes(entry.governance.rights_status) || !entry.governance.collection_class || !Number.isInteger(entry.governance.minimum_request_interval_ms) || entry.governance.minimum_request_interval_ms < 250) throw new Error(`${file}: invalid governance contract for ${entry.source}`);
     if (!Array.isArray(entry.expected_inputs) || !entry.expected_inputs.length || entry.expected_inputs.some(input => !input?.kind || !input?.uri) || !Array.isArray(entry.queries) || !entry.pagination?.termination) throw new Error(`${file}: invalid input/query/pagination contract for ${entry.source}`);
     if (!isISODate(entry.minimum_captured_at)) throw new Error(`${file}: invalid minimum_captured_at for ${entry.source}`);
     const resolved = path.resolve(runDir, entry.output_path);

@@ -63,20 +63,17 @@ const sourceProfile = profile ? {
   }
 } : null;
 
-const monthStart = `${capturedAt.slice(0, 8)}01`;
-const today = capturedAt.slice(0, 10);
 const sources = registry.sources.map(source => {
   const entry = structuredClone(source);
   delete entry.preferred_completeness;
   entry.adapter_status = inventoryBySource.get(entry.source);
-  entry.governance = { ...governance.defaults, collection_class: governanceBySource.get(entry.source) };
+  entry.governance = { ...governance.defaults, ...(governance.source_overrides?.[entry.source] || {}), collection_class: governanceBySource.get(entry.source) };
   entry.minimum_captured_at = capturedAt;
   entry.attempt_status = "planned";
   if (entry.source === "official_ats") {
     entry.scope = `${targets.jobs.length} named official ATS and company-career surfaces`;
     entry.expected_inputs = [{ kind: "named_targets", uri: "file:official-targets.json" }];
   }
-  if (entry.source === "gojobs") entry.scope = `AI and 인공지능 title queries posted ${monthStart} through ${today}`;
   return entry;
 });
 

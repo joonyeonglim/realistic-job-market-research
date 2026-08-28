@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const skillFile = path.join(root, "SKILL.md");
 const errors = [];
-const text = fs.existsSync(skillFile) ? fs.readFileSync(skillFile, "utf8") : "";
+const text = fs.existsSync(skillFile) ? fs.readFileSync(skillFile, "utf8").replace(/\r\n/g, "\n") : "";
 if (!/^---\n[\s\S]*?\n---\n/.test(text)) errors.push("SKILL.md frontmatter is missing");
 if (!/^name: realistic-job-market-research$/m.test(text)) errors.push("SKILL.md name is invalid");
 if (!/^description: .+/m.test(text)) errors.push("SKILL.md description is missing");

@@ -16,7 +16,7 @@ An evidence-first Agent Skill for Codex and Claude Code that audits public job p
 
 ### 1. 일부 검색 결과를 전체 시장으로 착각하지 않게 됩니다
 
-- 29개 등록 출처마다 검색 범위·질의·페이지네이션 종료 조건을 먼저 선언합니다. 현재 구현은 실수집 어댑터 13개, 접근 probe 15개, 인증 브라우저 handoff 1개이며 이 구분을 manifest에 보존합니다.
+- 29개 등록 출처마다 검색 범위·질의·페이지네이션 종료 조건을 먼저 선언합니다. 현재 구현은 자동 수집 어댑터 26개와 사용자 브라우저 handoff 3개이며 probe-only 출처는 없습니다. 이 구분을 manifest에 보존합니다.
 - 수집 성공 출처뿐 아니라 `partial`, `blocked`, `failed` 출처도 zero-row 증거와 실패 이유를 남깁니다.
 - 검색 페이지에 표시된 총건수를 실제로 회수한 공고처럼 만들지 않습니다.
 - 100행 단위 대시보드 페이지네이션은 화면 렌더링만 나눌 뿐 원장 행을 버리지 않습니다.
@@ -243,7 +243,7 @@ PNG가 필요한 문서·메신저에서는 [`media/workflow-overview.png`](medi
 
 ## 검증된 재현성
 
-공개 저장소에는 제3자 공고 본문을 포함하지 않는 29-source 합성 fixture가 있습니다. `npm run reference`가 선언 출처 29개를 모두 materialize하고, 구현 어댑터 13개에는 합성 행 1개씩, probe 15개와 인증 handoff 1개에는 zero-row 증거를 만든 뒤 정본 집계와 exact 비교합니다.
+공개 저장소에는 제3자 공고 본문을 포함하지 않는 29-source 합성 fixture가 있습니다. `npm run reference`가 선언 출처 29개를 모두 materialize하고, 자동 어댑터 26개에는 합성 행 1개씩, 브라우저 handoff 3개에는 zero-row 증거를 만든 뒤 정본 집계와 exact 비교합니다.
 
 별도의 비공개 2026-08-28 동결 raw도 같은 패키지로 재생해 29,469행 identity SHA, manifest mismatch 0, 40,001행 dashboard smoke, 원장·대시보드 audit PASS를 확인했습니다. 원문 재배포 권한이 확인되지 않은 제3자 본문은 공개하지 않으므로 이 수치는 공개 재현 fixture가 아니라 **owner attestation**입니다.
 
@@ -263,13 +263,12 @@ PNG가 필요한 문서·메신저에서는 [`media/workflow-overview.png`](medi
 
 ## 요구사항
 
-- Node.js 20 이상
-- Python 3.10 이상
+- 일반 설치 시 Node.js 20 이상. Node가 없으면 아래 bootstrap 설치가 사용자 캐시에 Node v24를 자동 구성합니다.
 - 공개 출처 수집을 위한 네트워크
-- 실제 대시보드 QA 또는 인증 출처 확인 시 로컬 브라우저
+- 실제 대시보드 QA 또는 Jobplanet·RocketPunch·Remember 확인 시 사용자 브라우저
 - 개인 맞춤 사용 시 로컬 profile 설정
 
-수집·점수 런타임은 Node.js·Python 표준 기능만 사용합니다. 브라우저 QA만 고정된 개발 의존성 Playwright를 사용합니다.
+Python은 별도 설치할 필요가 없습니다. `python-runner.mjs`가 Python 3.10 이상을 찾고, 없으면 공식 `uv`와 Python 3.12를 사용자 캐시에 자동 구성합니다. 브라우저 QA만 고정된 개발 의존성 Playwright를 사용합니다.
 
 ## 설치
 
@@ -279,6 +278,20 @@ Codex와 Claude Code에 전역 설치:
 npx skills add joonyeonglim/realistic-job-market-research \
   -g -a codex -a claude-code -y
 ```
+
+Node가 없는 macOS/Linux:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/joonyeonglim/realistic-job-market-research/main/install.sh | sh
+```
+
+Node가 없는 Windows PowerShell:
+
+```powershell
+irm https://raw.githubusercontent.com/joonyeonglim/realistic-job-market-research/main/install.ps1 | iex
+```
+
+bootstrap은 공식 Node v24 배포본을 사용자 캐시에만 풀고 `SHASUMS256.txt`와 대조합니다. 시스템 PATH나 전역 Python은 변경하지 않습니다.
 
 이 명령은 npm에 이 저장소를 패키지로 발행하는 방식이 아니라, `npx`로 [Skills CLI](https://github.com/vercel-labs/skills)를 실행해 GitHub의 canonical skill 디렉터리를 설치하는 방식입니다.
 
@@ -307,8 +320,8 @@ node ~/.agents/skills/realistic-job-market-research/scripts/doctor.mjs --global
 
 ## 현재 한계와 로드맵
 
-- 29개 출처 중 실수집 구현은 13개입니다. 나머지 15개는 probe, Remember는 인증 handoff이며 회수 공고로 세지 않습니다.
-- 출처별 이용조건과 재배포 권한은 모두 `review_required`입니다. 라이브 수집은 정책 확인 플래그가 없으면 시작하지 않습니다.
+- 29개 출처는 모두 실행 계약이 있습니다. 26개는 자동 수집하고 Jobplanet·RocketPunch·Remember 3개는 접근통제를 우회하지 않는 사용자 브라우저 export를 사용합니다.
+- Himalayas는 출처표시 조건의 공개 API입니다. 나머지 출처는 기술 접근 가능성과 별개로 `review_required`이며, 라이브 수집은 정책 확인 플래그가 없으면 시작하지 않습니다.
 - 점수는 합격 확률이 아닙니다. 실제 지원 결과가 30건 이상이고 긍정 결과가 5건 이상 쌓이기 전에는 예측 타당성을 주장하지 않습니다.
 - 외부 `skills` CLI의 갱신은 비원자적일 수 있어 활성 에이전트 세션 밖에서 실행합니다.
 
@@ -340,7 +353,7 @@ Claude Code:
 cd ~/.agents/skills/realistic-job-market-research
 node scripts/init-profile.mjs
 
-python3 scripts/validate_profile.py \
+node scripts/python-runner.mjs scripts/validate_profile.py \
   ~/.config/realistic-job-market-research/profile.json \
   --check-sources
 ```
@@ -360,6 +373,8 @@ node scripts/run-census.mjs \
   --run-dir /absolute/path/to/YYYY-MM-DD-ai-census \
   --acknowledge-source-policy
 ```
+
+Jobplanet·RocketPunch·Remember는 에이전트가 사용자 브라우저에서 공개된 선언 질의를 읽고 `imports/<source>.json`을 만든 뒤 같은 명령을 다시 실행합니다. 로그인·CAPTCHA·접근통제는 우회하지 않습니다. 형식은 [`browser-export.example.json`](skills/realistic-job-market-research/assets/browser-export.example.json)을 따릅니다.
 
 수집 없이 동결 raw를 재빌드할 때:
 
@@ -389,7 +404,7 @@ node scripts/run-census.mjs \
 ## 매칭 점수 계산
 
 ```bash
-python3 scripts/score_review.py \
+node scripts/python-runner.mjs scripts/score_review.py \
   --input /absolute/review.json \
   --profile ~/.config/realistic-job-market-research/profile.json \
   --output /absolute/scored-review.json
@@ -417,9 +432,9 @@ node scripts/audit-run.mjs \
 ```bash
 npm test
 npm run reference
-python3 scripts/validate_profile.py --self-test
-python3 scripts/validate_review.py --self-test
-python3 scripts/score_review.py --self-test
+node scripts/python-runner.mjs scripts/validate_profile.py --self-test
+node scripts/python-runner.mjs scripts/validate_review.py --self-test
+node scripts/python-runner.mjs scripts/score_review.py --self-test
 node scripts/verify-reference-run.mjs \
   --run-dir /absolute/replayed-reference-run
 ```

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "source": "jobplanet",
+  "captured_at": "2000-01-01T00:00:00Z",
+  "jobs": [
+    {
+      "source_id": "example-1",
+      "company": "Example Company",
+      "title": "AI Engineer",
+      "url": "https://www.jobplanet.co.kr/job/example-1",
+      "location": "서울",
+      "career_min": 3,
+      "career_max": null,
+      "employment": "정규직",
+      "deadline": null,
+      "posted_at": null,
+      "status": "browser_verified",
+      "match_terms": ["AI Engineer"],
+      "review_text": "Public browser-visible listing only"
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 name: realistic-job-market-research
 description: "Collect and audit public job postings, build a lossless filterable ledger, and realistically evaluate a shortlist against a local candidate profile, exact JD, company identity, current finance, commute or work policy, compensation, and hiring effort. Use for 'collect all openings', 'research these jobs realistically', 'which roles are worth the effort', or 'separate new, reposted, stale, and misleading openings'. Never submits applications or mutates profiles."
 license: MIT
-compatibility: "Codex and Claude Code. Requires Node.js 20+, Python 3.10+, network access for live public collection, and an optional local browser for authenticated review and browser QA."
+compatibility: "Codex and Claude Code. Uses Node.js 20+; root installers can provision Node locally. Python 3.10+ is discovered or provisioned automatically through uv. Network and an owner-controlled browser are needed for live and browser-handoff sources."
 ---
 
 # Realistic Job Market Research
@@ -19,11 +19,11 @@ Resolve supporting scripts from this skill directory, never from the user's proj
 
 1. Freeze the candidate contract from the local profile and verify referenced resume hashes. Do not paraphrase a mutable resume from memory.
 2. Choose a mode. `census` owns declared public collection and the filterable ledger. `review` starts from an audited ledger or named shortlist. `update` compares prior IDs and bodies with current pages.
-3. For `census`, read [references/census-runbook.md](references/census-runbook.md), initialize a new immutable run, and preserve the registry capability split: 13 implemented adapters, 15 access probes, and one authenticated handoff. Attempt every declared source without describing probe-only channels as collected, preserve blocked or failed zero-row artifacts, sync terminal states, build the manifest and dashboard, then run both executable gates.
+3. For `census`, read [references/census-runbook.md](references/census-runbook.md), initialize a new immutable run, and preserve the registry capability split: 26 automated adapters and 3 owner-browser handoffs. Run every declared source, import browser exports when available, preserve blocked or failed zero-row artifacts, sync terminal states, build the manifest and dashboard, then run both executable gates.
 4. For `review`, recheck every selected role on its current detail page. The exact body and source ID outrank title, tags, and search snippets.
 5. Extract mandatory and preferred requirements, duties, employment, exact location, work policy, compensation, deadline, and hiring steps. Use `UNKNOWN` when absent.
 6. Resolve employer identity before finance. Match every mandatory requirement to profile evidence as `confirmed`, `transferable`, `missing`, or `unknown`.
-7. Read [references/scoring-model.md](references/scoring-model.md), then calculate `JD Match Score`, `Opportunity Score`, `Evidence Coverage`, and `Evidence Quality` with `scripts/score_review.py`. Calculate raw weighted values at full precision, apply non-compensatory ceilings before bands and ranking, and report sensitivity profiles.
+7. Read [references/scoring-model.md](references/scoring-model.md), then calculate `JD Match Score`, `Opportunity Score`, `Evidence Coverage`, and `Evidence Quality` through `node scripts/python-runner.mjs scripts/score_review.py`; it supplies Python automatically when absent. Calculate raw weighted values at full precision, apply non-compensatory ceilings before bands and ranking, and report sensitivity profiles.
 8. Make two decisions: `PREPARE | CONDITIONAL | DROP` for application effort and `PASS | HOLD | NO_GO` for the employer or offer. Scores inform these states but never replace them.
 9. Adversarially recheck leaders using [references/pitfalls.md](references/pitfalls.md), including degree floors, customer-facing work, language, mandatory frameworks, scale, hidden tests, stale finance, and founder-commitment signals.
 10. Produce coverage, scored shortlist, component scores, sensitivity changes, hard exclusions, corrections, claim-level sources, unknowns, and resume actions. Validate machine-readable output.

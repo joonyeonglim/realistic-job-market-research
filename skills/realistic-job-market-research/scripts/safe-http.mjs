@@ -45,6 +45,8 @@ export function validatePublicUrl(input) {
   return url;
 }
 
+export const matchesDomain = (hostname, domain) => hostname === domain || hostname.endsWith(`.${domain}`);
+
 async function assertPublicResolution(url) {
   if (net.isIP(url.hostname)) return;
   const addresses = await dns.lookup(url.hostname, { all: true, verbatim: true });
@@ -114,7 +116,7 @@ export async function safeRequest(input, options = {}) {
         const response = await fetch(url, {
           ...fetchOptions,
           redirect: "manual",
-          headers: { accept: "application/json,text/html,text/plain,application/xhtml+xml", "user-agent": DEFAULT_USER_AGENT, ...headers },
+          headers: { accept: "application/json,application/xml,text/xml,text/html,text/plain,application/xhtml+xml", "user-agent": DEFAULT_USER_AGENT, ...headers },
           signal: AbortSignal.timeout(timeoutMs)
         });
         if ([301, 302, 303, 307, 308].includes(response.status)) {
@@ -125,7 +127,7 @@ export async function safeRequest(input, options = {}) {
           continue;
         }
         const contentType = response.headers.get("content-type") || "";
-        if (response.ok && contentType && !/(?:text\/|application\/(?:json|xml|xhtml\+xml|javascript))/i.test(contentType)) {
+        if (response.ok && contentType && !/(?:text\/|application\/(?:json|x-json|xml|rss\+xml|xhtml\+xml|javascript))/i.test(contentType)) {
           throw new Error(`unsupported content type: ${contentType}`);
         }
         const text = await boundedText(response, maxBytes);
