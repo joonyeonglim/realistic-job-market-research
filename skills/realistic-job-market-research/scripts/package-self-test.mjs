@@ -52,6 +52,7 @@ assert.match(run(process.execPath, [path.join(here, "smoke-dashboard.mjs")]), /S
 assert.equal(run(process.execPath, [path.join(here, "safe-http-self-test.mjs")]), "SAFE_HTTP_SELF_TEST_PASS");
 assert.equal(run(process.execPath, [path.join(here, "source-parsers-self-test.mjs")]), "SOURCE_PARSERS_SELF_TEST_PASS");
 assert.equal(run(process.execPath, [path.join(here, "adapter-contract-self-test.mjs")]), "ADAPTER_CONTRACT_PASS");
+assert.equal(run(process.execPath, [path.join(here, "test-search-completion.mjs")]), "SEARCH_COMPLETION_SELF_TEST_PASS");
 assert.equal(run(process.execPath, [path.join(here, "verify-public-reference.mjs")]), "PUBLIC_REFERENCE_PASS");
 assert.equal(run(process.execPath, [path.join(here, "generate-schemas.mjs")]), "SCHEMAS_IN_SYNC");
 assert.equal(run(process.execPath, [path.join(here, "doctor.mjs")]), "SKILL_DOCTOR_PASS");

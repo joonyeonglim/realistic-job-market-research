@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.1 — 2026-11-09
+
+- Remove the three-result cap from default prompts and quickstarts; keep one-request use while exposing the full reviewed and conditional set in the first cumulative report.
+- Start broad discovery from current listing feeds, resolve the observed promising queue and expand sparse or repeat-only results through another source or query family. Keep supplied-role checks narrow.
+- Treat worker topics as routing aids; distinguish mandatory requirements from preferences, summary omissions and unknown offer conditions.
+- Add a read-only completion checker for frozen intake, dispositions, report omissions, unresolved work, real limits and discovery coverage, with positive and negative regressions. Its verdict accounts for a declared batch, not market exhaustiveness or factual eligibility.
+
 ## 1.3.0 — 2026-11-09
 
 - Start with one natural-language request; reuse existing career context, select the research route automatically and return a small decision-first shortlist.

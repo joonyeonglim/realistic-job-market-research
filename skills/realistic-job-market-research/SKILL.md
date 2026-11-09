@@ -16,7 +16,7 @@ tools and checks; the user should not need to learn modes or prepare files.
    Do not ask for facts already available. If an essential constraint cannot be
    found, ask one short question and continue research that does not depend on it.
 2. Choose the work from the user's words:
-   - “찾아줘” → focused fresh search and a small shortlist.
+   - “찾아줘” → broad enough discovery before selecting priorities.
    - A company or job link → check that employer or role directly.
    - “새 공고 / 다시 봐줘” → compare with the previous result and recheck changes.
    - “전체 수집 / 전체 원장” → full-source census and dashboard.
@@ -27,16 +27,28 @@ tools and checks; the user should not need to learn modes or prepare files.
 4. Return the useful decision. Keep setup, commands, JSON, audit stages and
    scoring machinery inside the agent's work unless the user asks for them.
 
-## Give the user a small answer
+## Finish the research, then shorten the answer
 
-Lead with which role is worth preparing for, or the one condition to resolve first.
-Usually show up to three candidates; fewer or zero is valid. For each, give the
-job link, why it fits, the biggest obstacle/unknown and what to do next.
-Use plain Korean such as “지원 준비”, “확인 후 판단”, or “제외”.
+Answer length is a presentation choice, not a search limit. Do not stop because
+three recommendations were found. For broad discovery, start from current job
+listings, review the promising queue already observed, and change the source or
+query family when results are sparse or repetitive. A worker's topic is a routing
+aid, not a reason to discard a useful adjacent role. Keep the user's real limits.
 
-State the check date and any coverage gap briefly. Put source links beside the
-claims they support. Show more candidates, scores, a dashboard or detailed
-artifacts only when requested or needed for the decision.
+Maintain one cumulative private report and ledger: candidates, conditional
+options, exclusions, conflicts and blockers. Before closing a search, use the
+internal [completion check](references/search-completion.md). Known promising
+items must be reviewed or explicitly limited, not silently left for another
+“더 찾아줘”. This is bounded research, not proof the entire market is exhausted.
+
+Lead with useful priorities and their job links, actual product/work, fit, main
+obstacle and next action. Group the full reviewed candidate/conditional set and
+link the cumulative results in the first response; summarize to the requested
+length without hiding already available findings. Use plain Korean such as
+“지원 준비”, “확인 후 판단”, or “제외”.
+
+State the check date and actual coverage briefly, with source links near claims.
+Scores and dashboards are optional; the user does not prepare workflow files.
 
 ## Keep the decision honest
 
@@ -44,6 +56,9 @@ artifacts only when requested or needed for the decision.
   do not invent achievements or quietly relax an exclusion.
 - Missing information stays unknown. In particular, an unlisted coding test,
   take-home or live-coding step is not an explicit waiver.
+- Missing optional facts or a short summary are not proof of ineligibility.
+  Separate mandatory requirements, preferences, application preparation and
+  offer acceptance; do not hide useful conditional options behind unknown finance.
 - An attractive role can justify preparation while employer/offer conditions
   remain unresolved. Do not equate a search result with an active exact role.
 - Research does not authorize applying, saving, messaging, contacting anyone

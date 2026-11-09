@@ -30,10 +30,24 @@ Python is supplied by `scripts/python-runner.mjs` when needed.
 
 ## Focused search or a named role
 
-Start with relevant public channels and exact employer pages. Reuse an existing
-ledger for discovery when useful, then recheck selected roles live. Neither a
-29-source census nor a dashboard is a prerequisite for an ordinary shortlist.
-Describe the actual searched scope; unreviewed rows are not exclusions.
+For broad discovery, inspect a current job-listing surface using the requested
+region/role scope before settling on familiar employers. Use the runtime's
+authorized browser or collector; do not claim UI filters from headquarters or
+search snippets. Ads and curated cards may ignore list filters: check selected
+exact-role worksites. Named-company/job-link checks do not require broad discovery.
+Neither a 29-source census nor a dashboard is required for an ordinary search.
+
+Freeze the bounded observed intake, then triage it before deep review. Preserve
+exact source IDs/URLs and excerpts; no fuzzy company/title join. Inspect the
+promising remainder for current status, worksite, duties and mandatory versus
+preferred requirements. A worker's topic, unfamiliar title or missing short
+summary is not an exclusion. Route useful adjacent results to the shared queue.
+
+If a pass produces no useful options or only the same recommendations, change
+the source or query family and include adjacent product/backend/mobile/data roles
+using the candidate's skills. Do this before the first final report. Fixed quotas
+of companies, queries or recommendations do not establish completeness. Respect
+explicit owner limits and real access/runtime stops; preserve remaining items.
 
 Use [the evidence contract](evidence-contract.md) for role status, mandatory and
 preferred requirements, employer identity before finance, current fiscal year,
@@ -52,8 +66,19 @@ redirects, login blocks and empty JS shells do not prove a role is active or clo
 
 Keep application preparation separate from employer/offer acceptance. The internal
 states are `PREPARE | CONDITIONAL | DROP` and `PASS | HOLD | NO_GO`; translate them
-into ordinary Korean in the answer. Stop expanding the search when the requested
-scope and next decision have been addressed; disclose remaining unknowns.
+into ordinary Korean. Unknown finance, unspecified tests or an excluded-industry
+tenant's building name does not establish a hard role exclusion. Keep real
+assignment/effort gaps as conditions; never invent experience or waive requirements.
+
+Maintain one cumulative private report and ledger across follow-ups, including
+all reviewed candidates/conditional options and accessible exclusions, conflicts,
+source dates and blockers. Observations are not vacancy counts. A short chat
+summary must disclose full results/counts and link this record on the first report.
+Display length is not the research budget.
+
+Before closing, run the [search completion check](search-completion.md). Finish
+when the selected scope is covered and the observed promising queue is resolved
+or explicitly limited. This is bounded research, not proof of whole-market recall.
 
 Use numeric scoring when requested or when it materially helps compare candidates.
 If scoring is used, follow [the scoring model](scoring-model.md) and
@@ -68,7 +93,11 @@ request: [decision validation](decision-validation.md).
 
 ## Refresh a previous result
 
-Locate the previous shortlist or ledger yourself. Compare source IDs, exact
+Locate and update the cumulative report/ledger, preserving prior observations
+and corrections. For a broad refresh, start from its unresolved queue and make a
+different discovery pass rather than rerunning the same winners. If the request
+limits rechecking to supplied roles or status changes, check only that scope;
+do not expand to unrelated discovery or the rest of the old queue. Compare source IDs, exact
 bodies, capture times and profile snapshots; classify genuinely new, reposted,
 previously missed, closed and materially changed roles separately. A new URL is
 not a new opportunity. Preserve old evidence and add corrections. If no usable
