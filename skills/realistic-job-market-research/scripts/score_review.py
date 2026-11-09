@@ -214,6 +214,7 @@ def score_role(role: dict, scoring: dict) -> dict:
         "current_status": current_status,
         "application_stage": role["application_stage"],
         "offer_stage": role["offer_stage"],
+        "hiring_process": role["hiring_process"],
         "match_score": rounded(match_score, 1),
         "match_band": band(match_score, POLICY["bands"]["match"]),
         "match_components": {key: None if value is None else rounded(value, 1) for key, value in match_components.items()},
@@ -299,22 +300,32 @@ def robust_ranking(roles: list[dict], scoring: dict) -> dict:
     }
 
 
-def score_document(review: dict, profile: dict) -> dict:
-    review_errors = validate_document(review)
+def score_document(review: dict, profile: dict, *, require_hiring_checks: bool = False, check_sources: bool = False) -> dict:
+    review_errors = validate_document(review, require_hiring_checks=require_hiring_checks)
     if review_errors:
         raise ValueError("invalid review:\n" + "\n".join(review_errors))
-    profile_errors = validate_profile(profile)
+    profile_errors = validate_profile(profile, check_sources=check_sources)
     if profile_errors:
         raise ValueError("invalid profile:\n" + "\n".join(profile_errors))
     if review["candidate_profile_version"] != profile["profile_version"]:
         raise ValueError("candidate_profile_version does not match the supplied profile")
     exclusions = {str(value).strip().lower() for value in profile["preferences"]["hard_exclusions"]}
     avoid_chronic_loss = "avoid established chronic-loss" in profile["preferences"]["finance_policy"].lower()
+    max_effort = profile["preferences"]["hiring_effort_max"]
+    excluded_assessments = profile["preferences"].get("excluded_hiring_assessments", [])
     for role in review["roles"]:
+        checks = role["hiring_process"].get("checks", {})
+        assessment_gate = any(checks.get(axis, {}).get("status") == "REQUIRED" for axis in excluded_assessments)
         flag_gate = any(str(flag).strip().lower() in exclusions for flag in role["policy_flags"])
         finance_gate = avoid_chronic_loss and role["finance"]["grade"] == "D"
-        if role["gates"]["hard_exclusion"] != (flag_gate or finance_gate):
-            raise ValueError(f"{role['company']} {role['title']}: hard_exclusion does not match profile policy flags/finance policy")
+        if role["gates"]["hard_exclusion"] != (flag_gate or finance_gate or assessment_gate):
+            raise ValueError(f"{role['company']} {role['title']}: hard_exclusion does not match profile policy flags/finance policy/hiring assessment exclusions")
+        decision_ready = role["application_stage"] == "PREPARE" or role["offer_stage"] == "PASS"
+        effort = role["hiring_process"]["grade"]
+        if decision_ready and (effort == "UNKNOWN" or int(effort[1]) > int(max_effort[1])):
+            raise ValueError(f"{role['company']} {role['title']}: unresolved or above-limit hiring effort cannot be PREPARE/PASS (maximum {max_effort})")
+        if decision_ready and any(checks.get(axis, {}).get("status") != "EXPLICIT_NONE" for axis in excluded_assessments):
+            raise ValueError(f"{role['company']} {role['title']}: excluded hiring assessments need exact-role EXPLICIT_NONE evidence before PREPARE/PASS")
     scoring = profile["scoring"]
     roles = [score_role(role, scoring) for role in review["roles"]]
     roles.sort(key=lambda role: (not role["ranking_allowed"], -role["_sort"]["opportunity"], -role["_sort"]["match"], -role["_sort"]["confidence"], role["company"]))
@@ -342,6 +353,12 @@ def score_document(review: dict, profile: dict) -> dict:
         role.pop("_sort")
     return {
         "schema_version": 1,
+        "validation": {
+            "hiring_checks_required": require_hiring_checks,
+            "resume_source_check": ("PASS" if profile["resume"].get("source_files") else "NO_SOURCES") if check_sources else "NOT_RUN",
+            "resume_source_count": len(profile["resume"].get("source_files", [])),
+        },
+        "hiring_policy": {"hiring_effort_max": max_effort, "excluded_hiring_assessments": excluded_assessments},
         "scored_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "as_of": review["as_of"],
         "candidate_profile_version": review["candidate_profile_version"],
@@ -423,6 +440,8 @@ def main() -> int:
     parser.add_argument("--profile", type=Path)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--self-test", action="store_true")
+    parser.add_argument("--allow-legacy-review", action="store_true", help="Read historical reviews without per-assessment checks")
+    parser.add_argument("--skip-source-check", action="store_true", help="Historical/offline replay only; output records that resume files were not checked")
     args = parser.parse_args()
     if args.self_test:
         return self_test()
@@ -431,7 +450,7 @@ def main() -> int:
     try:
         review = json.loads(args.input.expanduser().read_text(encoding="utf-8"))
         profile = json.loads(args.profile.expanduser().read_text(encoding="utf-8"))
-        result = score_document(review, profile)
+        result = score_document(review, profile, require_hiring_checks=not args.allow_legacy_review, check_sources=not args.skip_source_check)
     except (OSError, json.JSONDecodeError, ValueError) as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 1

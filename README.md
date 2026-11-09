@@ -1,14 +1,26 @@
 # Realistic Job Market Research
 
-**Realistic Job Market Research**는 Codex와 Claude Code에서 함께 쓰는 공개 Agent Skill입니다. 공개 채용공고의 수집 범위를 감사 가능한 원장으로 보존하고, 로컬 후보자 증거로 직무 매칭 점수와 현실적인 지원 우선순위를 계산합니다.
+**“나 지원할 만한 데 찾아줘.”** 한 문장으로 시작하는 Codex·Claude Code 채용 조사 스킬입니다. 기존 경력과 조건을 참고해서 우선 볼 곳, 맞는 이유, 걸리는 조건과 다음 행동을 정리합니다.
 
 An evidence-first Agent Skill for Codex and Claude Code that audits public job postings, builds a lossless job-market ledger, and ranks roles against a private local candidate profile.
 
 [English quickstart](README.en.md)
 
+## 이렇게 쓰세요
+
+```text
+나 지원할 만한 데 찾아줘.
+이 공고 나랑 맞는지 봐줘: <공고 링크>
+지난번 결과에서 새 공고만 봐줘.
+```
+
+에이전트가 기존 경력 자료와 조건을 읽고 필요한 조사 경로를 고릅니다. 없어서 꼭 필요한 정보만 짧게 물어봅니다. 기본 결과는 우선 볼 곳 3개 이내와 이유·걸리는 점·다음 행동입니다. 파일 준비, 명령 실행, 조사 모드 선택을 먼저 할 필요는 없습니다.
+
+전체 원장이나 대시보드가 필요하면 “전체 공고를 수집해줘”라고 요청하세요. 일반 추천은 전체 수집이나 숫자 점수 계산을 선행하지 않습니다. 아래는 필요할 때 볼 수 있는 기능 설명과 수동 실행 안내입니다.
+
 ![Realistic Job Market Research — 29개 선언 출처 census, 22개 감사 게이트, Codex와 Claude 공통 스킬](media/github-social-preview.png)
 
-공고를 많이 보여주는 데서 끝나지 않습니다. 선언한 공개 출처를 모두 시도하고, 실제로 회수한 공고에서 정확한 JD·후보자 경력·법인 신원·최신 재무·통근 또는 근무정책·채용 피로도·보상을 검증해 지원 가치가 있는 소수 후보로 좁힙니다. Codex와 Claude Code는 같은 `SKILL.md`, 수집기, 정책, 검증기를 사용합니다.
+추천할 후보의 정확한 JD·경력 근거·고용 법인·재무·실제 근무지·전형·보상을 확인합니다. 전체 수집을 요청하면 선언한 공개 출처를 모두 시도하고 실패 범위까지 원장에 남깁니다. Codex와 Claude Code는 같은 `SKILL.md`, 수집기, 정책, 검증기를 사용합니다.
 
 > 핵심 결과: `공고가 그럴듯하다`가 아니라 `왜 준비할 가치가 있고, 무엇이 미확인이라 아직 입사 판단은 보류인지`를 구분합니다.
 
@@ -343,9 +355,11 @@ Claude Code:
 /realistic-job-market-research 지난 원장과 비교해서 신규·재게시·마감 공고를 구분해줘
 ```
 
-## 개인 맞춤 설정
+## 개인 맞춤 설정을 직접 관리할 때
 
 개인 정보는 공개 저장소 밖에 둡니다.
+
+일반 사용에서는 에이전트가 기존 자료를 읽고 필요한 실행별 설정을 준비합니다. 다음 명령은 설정을 직접 관리하려는 경우의 안내입니다.
 
 설치본을 사용하는 아래 명령은 canonical skill 디렉터리에서 실행합니다. 저장소 clone에서 직접 실행할 때는 `skills/realistic-job-market-research`로 이동합니다.
 

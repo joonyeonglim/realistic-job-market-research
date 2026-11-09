@@ -132,6 +132,14 @@ def validate(profile: object, check_sources: bool = False) -> list[str]:
     for field in ("finance_policy", "hiring_effort_max", "location_anchor"):
         if not isinstance(preferences.get(field), str) or not preferences[field].strip():
             errors.append(f"$.preferences.{field}: expected non-empty string")
+    if preferences.get("hiring_effort_max") not in {"F0", "F1", "F2", "F3"}:
+        errors.append("$.preferences.hiring_effort_max: expected F0, F1, F2, or F3")
+    excluded = preferences.get("excluded_hiring_assessments", [])
+    axes = {"coding_test", "take_home", "live_coding", "reference_check"}
+    if not isinstance(excluded, list) or any(not isinstance(item, str) or item not in axes for item in excluded):
+        errors.append("$.preferences.excluded_hiring_assessments: expected known hiring assessment axes")
+    elif len(excluded) != len(set(excluded)):
+        errors.append("$.preferences.excluded_hiring_assessments: duplicate axis")
     nonempty_list(preferences, "hard_exclusions", "$.preferences", errors)
     tiers = nonempty_list(preferences, "commute_tiers", "$.preferences", errors)
     if any(not isinstance(tier, dict) or not tier.get("grade") or not tier.get("rule") for tier in tiers):
@@ -153,7 +161,9 @@ def validate(profile: object, check_sources: bool = False) -> list[str]:
                 errors.append(f"$.resume.source_files[{index}].path: file not found")
                 continue
             expected = source.get("sha256")
-            if expected:
+            if not isinstance(expected, str) or not re.fullmatch(r"[0-9a-f]{64}", expected):
+                errors.append(f"$.resume.source_files[{index}].sha256: expected SHA-256")
+            else:
                 actual = hashlib.sha256(source_path.read_bytes()).hexdigest()
                 if actual != expected:
                     errors.append(f"$.resume.source_files[{index}].sha256: source drift")
