@@ -12,8 +12,10 @@ Check for new roles since the previous shortlist.
 
 The agent chooses the research route and handles files, commands and checks.
 It reuses available context and asks only for essential missing information.
-The default answer is up to three useful candidates; a full census and numeric
-scoring are optional. Ask for a complete ledger or dashboard when you need one.
+The first report shows priorities and links all reviewed candidates, conditional
+options and exclusions in one cumulative private document. A short answer is
+not a research limit: account for the promising observed queue or disclose an
+actual access/scope limit. A full census and numeric scoring remain optional.
 
 For full collection, the current registry contains 26 automated collectors and 3 owner-browser handoffs, covering all 29 declared sources without bypassing access controls. The detailed setup and manual commands below are available when needed.
 

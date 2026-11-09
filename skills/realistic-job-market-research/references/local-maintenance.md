@@ -1,7 +1,9 @@
 # Updates and Local Changes
 
-Version **1.3.0** includes the simple entrypoint and internal evidence checks
-developed against public v1.2.0. Earlier `1.2.1-local.20261109` and
+Version **1.3.1** separates first-report research completion from display length,
+preserves a cumulative result and checks the observed queue before closing.
+Version1.3.0 introduced the simple entrypoint and internal evidence checks against
+public v1.2.0. Earlier `1.2.1-local.20261109` and
 `1.2.2-local.20261109` installations were local working revisions of this change.
 Detailed execution lives in [agent workflow](agent-workflows.md).
 
