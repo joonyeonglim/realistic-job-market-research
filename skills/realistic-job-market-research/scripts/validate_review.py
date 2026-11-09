@@ -7,6 +7,7 @@ import argparse
 import json
 import re
 import sys
+from datetime import date
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -32,6 +33,8 @@ ALLOWED = {
 
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 FINANCE_AS_OF_RE = re.compile(r"^\d{4}(?:-\d{2}-\d{2})?$")
+HIRING_CHECKS = ("coding_test", "take_home", "live_coding", "reference_check")
+CHECK_STATES = {"REQUIRED", "EXPLICIT_NONE", "NOT_LISTED", "UNKNOWN"}
 IDENTITY_FIELD_ALIASES = {
     "domain": "official_domain",
     "official domain": "official_domain",
@@ -111,7 +114,43 @@ def validate_match_items(items: list, path: str, errors: list[str]) -> list[str]
     return matches
 
 
-def validate_role(role: object, index: int) -> list[str]:
+def validate_hiring_checks(hiring: dict, path: str, errors: list[str], required: bool) -> None:
+    checks = hiring.get("checks")
+    if checks is None and not required:
+        return  # Historical schema-v1 reviews remain readable through the Python API.
+    if not isinstance(checks, dict) or set(checks) != set(HIRING_CHECKS):
+        errors.append(f"{path}.checks: expected all four hiring assessment axes")
+        return
+    for axis in HIRING_CHECKS:
+        item = checks[axis]
+        item_path = f"{path}.checks.{axis}"
+        if not isinstance(item, dict):
+            errors.append(f"{item_path}: expected object")
+            continue
+        status = require_enum(item, "status", CHECK_STATES, item_path, errors)
+        scope = require_enum(item, "scope", {"exact_role", "company_general", "historical", "unknown"}, item_path, errors)
+        as_of = require_string(item, "as_of", item_path, errors)
+        require_string(item, "reason", item_path, errors)
+        evidence = require_list(item, "evidence", item_path, errors)
+        validate_urls(evidence, f"{item_path}.evidence", errors)
+        if status != "UNKNOWN" or as_of != "UNKNOWN":
+            try:
+                if not DATE_RE.fullmatch(as_of):
+                    raise ValueError
+                date.fromisoformat(as_of)
+            except ValueError:
+                errors.append(f"{item_path}.as_of: expected a real YYYY-MM-DD date")
+        if status != "UNKNOWN" and not evidence:
+            errors.append(f"{item_path}.evidence: observed assessment status requires evidence")
+        if status in {"REQUIRED", "EXPLICIT_NONE", "NOT_LISTED"} and scope != "exact_role":
+            errors.append(f"{item_path}: exact_role evidence required; general or historical policy cannot establish this role's status")
+    if hiring.get("grade") in {"F0", "F1"}:
+        axes = HIRING_CHECKS if hiring["grade"] == "F0" else HIRING_CHECKS[:3]
+        if any(not isinstance(checks[axis], dict) or checks[axis].get("status") != "EXPLICIT_NONE" for axis in axes):
+            errors.append(f"{path}: F0/F1 requires explicit absence evidence, not NOT_LISTED or UNKNOWN")
+
+
+def validate_role(role: object, index: int, *, require_hiring_checks: bool = False) -> list[str]:
     path = f"$.roles[{index}]"
     errors: list[str] = []
     if not isinstance(role, dict):
@@ -240,6 +279,7 @@ def validate_role(role: object, index: int) -> list[str]:
         errors.append(f"{path}.hiring_process.evidence: known hiring process requires evidence")
     if hiring_grade != "UNKNOWN" and not hiring_steps:
         errors.append(f"{path}.hiring_process.steps: known hiring process requires steps")
+    validate_hiring_checks(hiring, f"{path}.hiring_process", errors, require_hiring_checks)
 
     compensation = require_dict(role, "compensation", path, errors)
     compensation_status = require_enum(
@@ -286,6 +326,8 @@ def validate_role(role: object, index: int) -> list[str]:
         errors.append(f"{path}: closed role must have application_stage DROP")
     if current == "closed" and offer == "PASS":
         errors.append(f"{path}: closed role cannot have offer_stage PASS")
+    if current == "ambiguous" and application == "PREPARE":
+        errors.append(f"{path}: ambiguous current role cannot be PREPARE")
     if identity_status == "unverified" and finance_grade != "UNVERIFIED":
         errors.append(f"{path}: unverified identity requires finance grade UNVERIFIED")
     if hard_exclusion is True and application != "DROP":
@@ -297,6 +339,9 @@ def validate_role(role: object, index: int) -> list[str]:
     if "unknown" in matches and application == "PREPARE":
         errors.append(f"{path}: unknown mandatory requirement cannot be PREPARE")
     if offer == "PASS":
+        checks = hiring.get("checks", {})
+        if isinstance(checks, dict) and checks and any(not isinstance(item, dict) or item.get("status") not in {"REQUIRED", "EXPLICIT_NONE"} for item in checks.values()):
+            errors.append(f"{path}: PASS requires resolved hiring assessment axes")
         if current != "active":
             errors.append(f"{path}: PASS requires active current_status")
         if identity_status != "confirmed" or finance_grade == "UNVERIFIED":
@@ -319,7 +364,7 @@ def validate_role(role: object, index: int) -> list[str]:
     return errors
 
 
-def validate_document(document: object) -> list[str]:
+def validate_document(document: object, *, require_hiring_checks: bool = False) -> list[str]:
     errors = collect_forbidden(document)
     if not isinstance(document, dict):
         return errors + ["$: expected object"]
@@ -337,7 +382,7 @@ def validate_document(document: object) -> list[str]:
     if not roles:
         errors.append("$.roles: expected at least one role")
     for index, role in enumerate(roles):
-        errors.extend(validate_role(role, index))
+        errors.extend(validate_role(role, index, require_hiring_checks=require_hiring_checks))
     identities = [(role.get("company"), role.get("title"), role.get("url")) for role in roles if isinstance(role, dict)]
     if len(identities) != len(set(identities)):
         errors.append("$.roles: duplicate company/title/url role identity")
@@ -404,6 +449,10 @@ def sample_document() -> dict:
                     "grade": "F0",
                     "steps": ["Interview"],
                     "evidence": [url],
+                    "checks": {
+                        axis: {"status": "EXPLICIT_NONE", "scope": "exact_role", "as_of": "2000-01-15", "reason": f"Synthetic exact-role fixture explicitly waives {axis}.", "evidence": [url]}
+                        for axis in HIRING_CHECKS
+                    },
                 },
                 "compensation": {
                     "status": "unknown",
@@ -442,6 +491,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("review", nargs="?", type=Path)
     parser.add_argument("--self-test", action="store_true")
+    parser.add_argument("--allow-legacy-review", action="store_true", help="Read historical reviews without per-assessment checks; not a current no-test verification")
     args = parser.parse_args()
     if args.self_test:
         return self_test()
@@ -452,7 +502,7 @@ def main() -> int:
     except (OSError, json.JSONDecodeError) as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 2
-    errors = validate_document(document)
+    errors = validate_document(document, require_hiring_checks=not args.allow_legacy_review)
     if errors:
         for error in errors:
             print(f"ERROR: {error}", file=sys.stderr)

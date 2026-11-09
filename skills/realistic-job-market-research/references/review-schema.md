@@ -32,7 +32,7 @@
 - `company_identity`: `status` (`confirmed | unverified`), `matched_fields[]`, `evidence[]`;
 - `finance`: `grade` (`A | B | C | D | UNVERIFIED`), `as_of`, `facts[]`, `evidence[]`;
 - `location_work_policy`: `grade` (`good | acceptable | poor | unknown`), `facts[]`, `evidence[]`;
-- `hiring_process`: `grade` (`F0 | F1 | F2 | F3 | UNKNOWN`), `steps[]`, `evidence[]`;
+- `hiring_process`: `grade` (`F0 | F1 | F2 | F3 | UNKNOWN`), `steps[]`, `evidence[]`, and `checks` for `coding_test`, `take_home`, `live_coding`, `reference_check`; each has `status`, `scope`, `as_of`, `reason`, `evidence[]` as defined in [hiring assessment policy](hiring-assessment-policy.md);
 - `compensation`: `status` (`confirmed | unknown`), `grade` (`good | acceptable | poor | unknown`), `facts[]`, and `evidence[]`;
 - `application_stage`: `PREPARE | CONDITIONAL | DROP`;
 - `offer_stage`: `PASS | HOLD | NO_GO`;
@@ -43,6 +43,9 @@ Evidence items are HTTP(S) URLs. `candidate_evidence` may be `UNKNOWN` but must 
 ## Validator invariants
 
 - Closed roles cannot be `PREPARE` or offer-stage `PASS`.
+- Ambiguous roles cannot be `PREPARE`.
+- Current CLI reviews require four assessment axes; explicit requirements/waivers need dated exact-role evidence. F0/F1 cannot be inferred from omissions. `--allow-legacy-review` reads historical files without claiming new verification.
+- Scoring enforces `preferences.hiring_effort_max` and optional `excluded_hiring_assessments` before accepting `PREPARE/PASS`, and validates configured resume file hashes unless explicitly replaying offline.
 - A hard exclusion requires `DROP / NO_GO`.
 - A missing or unknown mandatory requirement cannot be `PREPARE`.
 - Confirmed identity requires at least two distinct canonical 2-of-4 fields and supporting evidence.
@@ -62,6 +65,7 @@ Evidence items are HTTP(S) URLs. `candidate_evidence` may be `UNKNOWN` but must 
 - `match_calculation`, `opportunity_calculation`, and `confidence_calculation`, including every numeric term, numerator, denominator, raw value, active ceiling, and displayed value;
 - caps, gate warnings, and `ranking_allowed`;
 - alternative Opportunity Scores and ranks plus 10,000-run deterministic robustness ranges.
+- the original `hiring_process` evidence, applied `hiring_policy`, and a `validation` record distinguishing resume source `PASS`, `NO_SOURCES`, and `NOT_RUN`.
 
 Portable generated schemas live in `schemas/`; `scripts/generate-schemas.mjs` is their generator and drift gate.
 

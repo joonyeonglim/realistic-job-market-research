@@ -1,6 +1,21 @@
 # Realistic Job Market Research
 
-An evidence-first Agent Skill for Codex and Claude Code that audits public job postings, builds a lossless job-market ledger, and ranks roles against a private local candidate profile. The current registry contains 26 automated collectors and 3 owner-browser handoffs, covering all 29 declared sources without bypassing access controls.
+Ask **“Find jobs worth applying to for me.”** This Codex and Claude Code skill reuses existing career evidence and preferences, checks current roles, and returns a small shortlist with the fit, obstacle and next action.
+
+## Start with a request
+
+```text
+Find jobs worth applying to for me.
+Check whether this job fits my experience: <job URL>
+Check for new roles since the previous shortlist.
+```
+
+The agent chooses the research route and handles files, commands and checks.
+It reuses available context and asks only for essential missing information.
+The default answer is up to three useful candidates; a full census and numeric
+scoring are optional. Ask for a complete ledger or dashboard when you need one.
+
+For full collection, the current registry contains 26 automated collectors and 3 owner-browser handoffs, covering all 29 declared sources without bypassing access controls. The detailed setup and manual commands below are available when needed.
 
 ## Install
 

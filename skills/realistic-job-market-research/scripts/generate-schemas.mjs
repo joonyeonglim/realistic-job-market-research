@@ -8,6 +8,16 @@ const policy = JSON.parse(fs.readFileSync(path.join(root, "assets", "scoring-pol
 const outputDir = path.join(root, "schemas");
 const string = { type: "string", minLength: 1 };
 const url = { type: "string", format: "uri", pattern: "^https?://" };
+const assessmentAxes = ["coding_test", "take_home", "live_coding", "reference_check"];
+const assessmentCheck = {
+  type: "object", additionalProperties: false,
+  required: ["status", "scope", "as_of", "reason", "evidence"],
+  properties: {
+    status: { enum: ["REQUIRED", "EXPLICIT_NONE", "NOT_LISTED", "UNKNOWN"] },
+    scope: { enum: ["exact_role", "company_general", "historical", "unknown"] },
+    as_of: string, reason: string, evidence: { type: "array", items: url }
+  }
+};
 const weights = keys => ({ type: "object", additionalProperties: false, required: keys, properties: Object.fromEntries(keys.map(key => [key, { type: "number", minimum: 0, maximum: 100 }])) });
 const matchItem = {
   type: "object", additionalProperties: false, required: ["requirement", "candidate_evidence", "match"],
@@ -25,7 +35,7 @@ const profile = {
     schema_version: { const: 1 }, profile_version: string, captured_at: { type: "string", format: "date-time" }, career_years: { type: "number", exclusiveMinimum: 0 },
     candidate: { type: "object", required: ["target_roles", "defensible_level", "degree", "proven_strengths", "known_gaps"], properties: { target_roles: { type: "array", minItems: 1, items: string }, defensible_level: string, degree: string, proven_strengths: { type: "array", minItems: 1, items: string }, known_gaps: { type: "array", minItems: 1, items: string } } },
     scoring: { type: "object", required: ["model_version", "policy_source", "weight_method", "elicited_at", "rationale", "match_weights", "opportunity_weights", "match_values", "axis_values", "confidence_threshold", "sensitivity_profiles"], properties: { model_version: { const: policy.model_version }, policy_source: string, weight_method: string, elicited_at: { type: "string", format: "date" }, rationale: string, match_weights: weights(Object.keys(policy.match_weights)), opportunity_weights: weights(Object.keys(policy.opportunity_weights)), match_values: weights(Object.keys(policy.match_values)), axis_values: { type: "object" }, confidence_threshold: { type: "number", minimum: 0, maximum: 100 }, sensitivity_profiles: { type: "object", minProperties: 1, additionalProperties: weights(Object.keys(policy.opportunity_weights)) } } },
-    preferences: { type: "object" }, resume: { type: "object" }
+    preferences: { type: "object", properties: { hiring_effort_max: { enum: ["F0", "F1", "F2", "F3"] }, excluded_hiring_assessments: { type: "array", uniqueItems: true, items: { enum: assessmentAxes } } } }, resume: { type: "object" }
   }
 };
 
@@ -39,7 +49,11 @@ const review = {
       company: string, title: string, url, current_status: { enum: ["active", "closed", "ambiguous", "reposted"] },
       requirements: { type: "object", required: ["must_have", "preferred"], properties: { must_have: { type: "array", minItems: 1, items: matchItem }, preferred: { type: "array", items: matchItem } } },
       fit: { type: "object" }, gates: { type: "object" }, policy_flags: { type: "array", items: string }, evidence_quality: { type: "object", required: ["grade", "freshness", "reason"], properties: { grade: { enum: ["high", "medium", "low", "unverified"] }, freshness: { enum: ["current", "mixed", "stale", "unknown"] }, reason: string } },
-      company_identity: { type: "object" }, finance: evidenceBlock(["A", "B", "C", "D", "UNVERIFIED"], ["as_of"]), location_work_policy: { type: "object" }, hiring_process: { type: "object" }, compensation: { type: "object" },
+      company_identity: { type: "object" }, finance: evidenceBlock(["A", "B", "C", "D", "UNVERIFIED"], ["as_of"]), location_work_policy: { type: "object" },
+      hiring_process: { type: "object", required: ["grade", "steps", "evidence", "checks"], properties: {
+        grade: { enum: ["F0", "F1", "F2", "F3", "UNKNOWN"] }, steps: { type: "array", items: string }, evidence: { type: "array", items: url },
+        checks: { type: "object", additionalProperties: false, required: assessmentAxes, properties: Object.fromEntries(assessmentAxes.map(axis => [axis, assessmentCheck])) }
+      } }, compensation: { type: "object" },
       application_stage: { enum: ["PREPARE", "CONDITIONAL", "DROP"] }, offer_stage: { enum: ["PASS", "HOLD", "NO_GO"] }, decision_reason: string, unknowns: { type: "array", items: string }, resume_actions: { type: "array", items: string }, evidence: { type: "array", minItems: 1, items: url }
     } } }
   }

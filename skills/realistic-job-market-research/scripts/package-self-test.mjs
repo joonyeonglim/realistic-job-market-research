@@ -58,6 +58,7 @@ assert.equal(run(process.execPath, [path.join(here, "doctor.mjs")]), "SKILL_DOCT
 assert.match(run(process.execPath, [path.join(here, "python-runner.mjs"), "--self-test"]), /^PYTHON_RUNNER_PASS/);
 assert.equal(runPython("validate_profile.py", ["--self-test"]), "SELF_TEST_PASS");
 assert.equal(runPython("validate_review.py", ["--self-test"]), "SELF_TEST_PASS");
+runPython("test_review_policy.py");
 assert.equal(runPython("score_review.py", ["--self-test"]), "SELF_TEST_PASS");
 assert.equal(runPython("derive_swing_weights.py", ["--self-test"]), "SWING_WEIGHT_SELF_TEST_PASS");
 assert.equal(runPython("evaluate_outcomes.py", ["--self-test"]), "OUTCOME_EVAL_SELF_TEST_PASS");
@@ -83,7 +84,7 @@ assert.equal(scored.roles[0].opportunity_calculation.denominator, 100);
 assert.equal(scored.roles[0].opportunity_calculation.raw_score, 84.9196);
 assert.equal(scored.roles[0].confidence_calculation.raw_score, 93);
 assert.equal(scored.roles[0].sensitivity_rank.fit_first, 1);
-assert.match(fs.readFileSync(path.join(root, "SKILL.md"), "utf8"), new RegExp(`${adapterCounts.implemented} automated adapters and ${adapterCounts.authenticated_handoff} owner-browser handoffs`));
+assert.match(fs.readFileSync(path.join(root, "references/agent-workflows.md"), "utf8"), new RegExp(`${adapterCounts.implemented} automated adapters and ${adapterCounts.authenticated_handoff} owner-browser handoffs`));
 if (docsRoot === repoRoot) {
   assert.match(fs.readFileSync(path.join(repoRoot, "README.md"), "utf8"), new RegExp(`자동 수집 어댑터 ${adapterCounts.implemented}개와 사용자 브라우저 handoff ${adapterCounts.authenticated_handoff}개`));
   for (const file of ["README.en.md", "AUDIT.md"]) assert.match(fs.readFileSync(path.join(repoRoot, file), "utf8"), new RegExp(`${adapterCounts.implemented} automated collectors and ${adapterCounts.authenticated_handoff} owner-browser handoffs`));

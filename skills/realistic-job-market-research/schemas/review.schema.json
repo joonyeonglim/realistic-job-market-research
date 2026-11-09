@@ -260,7 +260,231 @@
             "type": "object"
           },
           "hiring_process": {
-            "type": "object"
+            "type": "object",
+            "required": [
+              "grade",
+              "steps",
+              "evidence",
+              "checks"
+            ],
+            "properties": {
+              "grade": {
+                "enum": [
+                  "F0",
+                  "F1",
+                  "F2",
+                  "F3",
+                  "UNKNOWN"
+                ]
+              },
+              "steps": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "evidence": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uri",
+                  "pattern": "^https?://"
+                }
+              },
+              "checks": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "coding_test",
+                  "take_home",
+                  "live_coding",
+                  "reference_check"
+                ],
+                "properties": {
+                  "coding_test": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "status",
+                      "scope",
+                      "as_of",
+                      "reason",
+                      "evidence"
+                    ],
+                    "properties": {
+                      "status": {
+                        "enum": [
+                          "REQUIRED",
+                          "EXPLICIT_NONE",
+                          "NOT_LISTED",
+                          "UNKNOWN"
+                        ]
+                      },
+                      "scope": {
+                        "enum": [
+                          "exact_role",
+                          "company_general",
+                          "historical",
+                          "unknown"
+                        ]
+                      },
+                      "as_of": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "reason": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "evidence": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "format": "uri",
+                          "pattern": "^https?://"
+                        }
+                      }
+                    }
+                  },
+                  "take_home": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "status",
+                      "scope",
+                      "as_of",
+                      "reason",
+                      "evidence"
+                    ],
+                    "properties": {
+                      "status": {
+                        "enum": [
+                          "REQUIRED",
+                          "EXPLICIT_NONE",
+                          "NOT_LISTED",
+                          "UNKNOWN"
+                        ]
+                      },
+                      "scope": {
+                        "enum": [
+                          "exact_role",
+                          "company_general",
+                          "historical",
+                          "unknown"
+                        ]
+                      },
+                      "as_of": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "reason": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "evidence": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "format": "uri",
+                          "pattern": "^https?://"
+                        }
+                      }
+                    }
+                  },
+                  "live_coding": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "status",
+                      "scope",
+                      "as_of",
+                      "reason",
+                      "evidence"
+                    ],
+                    "properties": {
+                      "status": {
+                        "enum": [
+                          "REQUIRED",
+                          "EXPLICIT_NONE",
+                          "NOT_LISTED",
+                          "UNKNOWN"
+                        ]
+                      },
+                      "scope": {
+                        "enum": [
+                          "exact_role",
+                          "company_general",
+                          "historical",
+                          "unknown"
+                        ]
+                      },
+                      "as_of": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "reason": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "evidence": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "format": "uri",
+                          "pattern": "^https?://"
+                        }
+                      }
+                    }
+                  },
+                  "reference_check": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "status",
+                      "scope",
+                      "as_of",
+                      "reason",
+                      "evidence"
+                    ],
+                    "properties": {
+                      "status": {
+                        "enum": [
+                          "REQUIRED",
+                          "EXPLICIT_NONE",
+                          "NOT_LISTED",
+                          "UNKNOWN"
+                        ]
+                      },
+                      "scope": {
+                        "enum": [
+                          "exact_role",
+                          "company_general",
+                          "historical",
+                          "unknown"
+                        ]
+                      },
+                      "as_of": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "reason": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "evidence": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "format": "uri",
+                          "pattern": "^https?://"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "compensation": {
             "type": "object"

@@ -30,3 +30,5 @@ node scripts/python-runner.mjs scripts/validate_profile.py ~/.config/realistic-j
 ```
 
 Raw census initialization works without a profile. Review queues, personalized decisions, and scoring fail closed until a valid profile is supplied.
+
+`preferences.hiring_effort_max` is `F0`, `F1`, `F2` or `F3` and is enforced by scoring. Optional `preferences.excluded_hiring_assessments` lists any of `coding_test`, `take_home`, `live_coding`, `reference_check`. Do not infer exclusions from a general desire for low effort; freeze the user's actual constraints in a private per-run profile. See [hiring assessment policy](hiring-assessment-policy.md). Existing private settings are not automatically migrated or overwritten.

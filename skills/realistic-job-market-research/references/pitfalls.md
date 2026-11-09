@@ -30,6 +30,9 @@ These are the failure modes the workflow must actively test, not optional readin
 | P24 | Portal summary tag contradicts underlying data | Preserve both; higher-authority underlying data wins. |
 | P25 | Conflicting figures are averaged | Report both with year and source; explain any selected value. |
 | P26 | A short page is treated as the final page | Stop only on the declared terminal contract, such as cursor exhaustion or consecutive empty pages. |
+| P27 | An interview-only diagram becomes a no-test guarantee | Preserve separate coding, take-home, live-coding and reference axes; omission is NOT_LISTED. |
+| P28 | A good score hides effort above the candidate maximum | Enforce the frozen profile ceiling before PREPARE/PASS; retain conditional candidates outside the ranked ready list. |
+| P29 | A profile version stays unchanged while its resume sources drift | Check configured source hashes during current scoring; reconcile the changed SSOT rather than silently blessing a new hash. |
 
 ## Additional realistic-review checks
 

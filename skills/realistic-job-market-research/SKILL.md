@@ -1,63 +1,51 @@
 ---
 name: realistic-job-market-research
-description: "Collect and audit public job postings, build a lossless filterable ledger, and realistically evaluate a shortlist against a local candidate profile, exact JD, company identity, current finance, commute or work policy, compensation, and hiring effort. Use for 'collect all openings', 'research these jobs realistically', 'which roles are worth the effort', or 'separate new, reposted, stale, and misleading openings'. Never submits applications or mutates profiles."
+description: "Find jobs worth applying to, check a job link, or refresh a previous shortlist using existing career evidence. Use for '지원할 만한 데 찾아줘', '이 회사 어때?', or '새 공고만 봐줘'. Does not submit applications."
 license: MIT
-compatibility: "Codex and Claude Code. Uses Node.js 20+; root installers can provision Node locally. Python 3.10+ is discovered or provisioned automatically through uv. Network and an owner-controlled browser are needed for live and browser-handoff sources."
+compatibility: "Codex and Claude Code. Bundled collectors use Node.js 20+; live sources need network and the configured browser."
 ---
 
 # Realistic Job Market Research
 
-## Purpose
+“나 지원할 만한 데 찾아줘.” is enough. The agent handles context, research,
+tools and checks; the user should not need to learn modes or prepare files.
 
-Reproduce a complete two-stage workflow: declared-source census and artifact audit first, personalized realistic review second. Distinguish low-cost application preparation from the stricter decision to join an employer.
+## Start from the request
 
-For personalized review, read and validate the private profile described in [references/personalization.md](references/personalization.md). Default path: `~/.config/realistic-job-market-research/profile.json`. A raw census does not require a profile.
+1. Reuse the current conversation, saved candidate profile and career sources.
+   Do not ask for facts already available. If an essential constraint cannot be
+   found, ask one short question and continue research that does not depend on it.
+2. Choose the work from the user's words:
+   - “찾아줘” → focused fresh search and a small shortlist.
+   - A company or job link → check that employer or role directly.
+   - “새 공고 / 다시 봐줘” → compare with the previous result and recheck changes.
+   - “전체 수집 / 전체 원장” → full-source census and dashboard.
+   A normal recommendation does not require a full census first.
+3. Follow only the selected route in [the agent workflow](references/agent-workflows.md).
+   Read current exact job details, match the user's career, and check the practical
+   obstacles: employer risk, actual worksite, pay/level and hiring effort.
+4. Return the useful decision. Keep setup, commands, JSON, audit stages and
+   scoring machinery inside the agent's work unless the user asks for them.
 
-Resolve supporting scripts from this skill directory, never from the user's project cwd. Claude Code can use `${CLAUDE_SKILL_DIR}`; in Codex, use the absolute directory containing this `SKILL.md`.
+## Give the user a small answer
 
-## Workflow
+Lead with which role is worth preparing for, or the one condition to resolve first.
+Usually show up to three candidates; fewer or zero is valid. For each, give the
+job link, why it fits, the biggest obstacle/unknown and what to do next.
+Use plain Korean such as “지원 준비”, “확인 후 판단”, or “제외”.
 
-1. Freeze the candidate contract from the local profile and verify referenced resume hashes. Do not paraphrase a mutable resume from memory.
-2. Choose a mode. `census` owns declared public collection and the filterable ledger. `review` starts from an audited ledger or named shortlist. `update` compares prior IDs and bodies with current pages.
-3. For `census`, read [references/census-runbook.md](references/census-runbook.md), initialize a new immutable run, and preserve the registry capability split: 26 automated adapters and 3 owner-browser handoffs. Run every declared source, import browser exports when available, preserve blocked or failed zero-row artifacts, sync terminal states, build the manifest and dashboard, then run both executable gates.
-4. For `review`, recheck every selected role on its current detail page. The exact body and source ID outrank title, tags, and search snippets.
-5. Extract mandatory and preferred requirements, duties, employment, exact location, work policy, compensation, deadline, and hiring steps. Use `UNKNOWN` when absent.
-6. Resolve employer identity before finance. Match every mandatory requirement to profile evidence as `confirmed`, `transferable`, `missing`, or `unknown`.
-7. Read [references/scoring-model.md](references/scoring-model.md), then calculate `JD Match Score`, `Opportunity Score`, `Evidence Coverage`, and `Evidence Quality` through `node scripts/python-runner.mjs scripts/score_review.py`; it supplies Python automatically when absent. Calculate raw weighted values at full precision, apply non-compensatory ceilings before bands and ranking, and report sensitivity profiles.
-8. Make two decisions: `PREPARE | CONDITIONAL | DROP` for application effort and `PASS | HOLD | NO_GO` for the employer or offer. Scores inform these states but never replace them.
-9. Adversarially recheck leaders using [references/pitfalls.md](references/pitfalls.md), including degree floors, customer-facing work, language, mandatory frameworks, scale, hidden tests, stale finance, and founder-commitment signals.
-10. Produce coverage, scored shortlist, component scores, sensitivity changes, hard exclusions, corrections, claim-level sources, unknowns, and resume actions. Validate machine-readable output.
+State the check date and any coverage gap briefly. Put source links beside the
+claims they support. Show more candidates, scores, a dashboard or detailed
+artifacts only when requested or needed for the decision.
 
-## Modes
+## Keep the decision honest
 
-- **Census:** after reviewing the source policy, run `<skill-dir>/scripts/run-census.mjs --run-dir /absolute/run/path --acknowledge-source-policy` with Node.js.
-- **Named shortlist:** deeply verify roles supplied by the user.
-- **Audited ledger:** select a small review set; unreviewed rows are not exclusions.
-- **Update correction:** label genuinely new, reposted, previously missed, closed, and materially changed roles separately.
-
-## Rules
-
-- Prefer official career pages and exact job details. A search result is discovery evidence, not proof that a role is active.
-- Never call a query-limited, blocked, or failed source complete. Never synthesize rows from provider totals.
-- Preserve conflicting facts with both sources; do not average them.
-- Do not infer salary, work policy, degree requirements, finance, or hiring steps.
-- Do not express unsupported hiring probabilities as percentages. Use reasoned `high`, `medium`, or `low` fit labels.
-- Never present a score without its components, numeric calculation trail, evidence coverage and quality, model version, weights, and active caps.
-- Do not store recruiter names, emails, phone numbers, private messages, credentials, or confidential employer data.
-- Do not apply, save, message, edit a profile, or contact anyone without explicit authorization for that action.
-- Keep the final shortlist small. More rows are not a better result.
-
-## References
-
-- [references/census-runbook.md](references/census-runbook.md) — read for collection, resume, and artifact transitions.
-- [references/source-registry.md](references/source-registry.md) — 29-source scope and completeness contract.
-- [references/source-governance.md](references/source-governance.md) — collection authorization, retention, rate, and redistribution boundary.
-- [references/raw-schema.md](references/raw-schema.md) and [references/verification-gates.md](references/verification-gates.md) — read before build or audit claims.
-- [references/evidence-contract.md](references/evidence-contract.md) — read before finance, identity, status, or decision classification.
-- [references/review-schema.md](references/review-schema.md) — read when producing or validating machine-readable review JSON.
-- [references/scoring-model.md](references/scoring-model.md) — research basis, formulas, weights, caps, and sensitivity analysis.
-- [references/decision-validation.md](references/decision-validation.md) — owner swing weighting and prospective outcome validation.
-- [references/personalization.md](references/personalization.md) — local profile and public/private boundary.
-- [references/authenticated-sources.md](references/authenticated-sources.md) — read before any personalized browser source.
-- [references/pitfalls.md](references/pitfalls.md) — adversarial checks learned from failed scans.
-- [references/reproducibility.md](references/reproducibility.md) — frozen reference-run parity evidence.
+- Preserve the user's actual constraints. Reuse verified career evidence;
+  do not invent achievements or quietly relax an exclusion.
+- Missing information stays unknown. In particular, an unlisted coding test,
+  take-home or live-coding step is not an explicit waiver.
+- An attractive role can justify preparation while employer/offer conditions
+  remain unresolved. Do not equate a search result with an active exact role.
+- Research does not authorize applying, saving, messaging, contacting anyone
+  or editing the user's global profile. Keep private facts and contacts out of
+  public artifacts.

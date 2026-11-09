@@ -276,7 +276,29 @@
       }
     },
     "preferences": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "hiring_effort_max": {
+          "enum": [
+            "F0",
+            "F1",
+            "F2",
+            "F3"
+          ]
+        },
+        "excluded_hiring_assessments": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "coding_test",
+              "take_home",
+              "live_coding",
+              "reference_check"
+            ]
+          }
+        }
+      }
     },
     "resume": {
       "type": "object"

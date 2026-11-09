@@ -9,11 +9,11 @@ Use a dated, versioned source supplied by the user. Capture only what changes de
 | Status | Meaning |
 |---|---|
 | `active` | The exact current detail body is visible and accepting candidates. |
-| `closed` | The employer marks it closed, removes the role, or redirects to a generic list without it. |
+| `closed` | Current employer evidence explicitly marks it closed or verifies the role was removed. A redirect alone is insufficient. |
 | `ambiguous` | A mirror and official source conflict, or the current body cannot be verified. |
 | `reposted` | The same employer, role, and substantially identical body reappeared under a new source ID or channel. |
 
-Classify updates as `genuinely_new`, `reposted`, `previously_missed`, `closed`, or `materially_changed`. A new URL alone is not a new opportunity.
+Classify updates as `genuinely_new`, `reposted`, `previously_missed`, `closed`, or `materially_changed`. A new URL alone is not a new opportunity. Keep update classification separate from availability: `reposted` still needs current detail evidence. Login/region redirects, challenges and empty JS shells are `ambiguous`, not proof of closure. Ambiguous roles cannot be `PREPARE`.
 
 ## Exact-JD matching
 
@@ -66,6 +66,8 @@ Use the user's own anchor and thresholds. Verify the exact office or named stati
 | `UNKNOWN` | Exact current-role process is not published. |
 
 Do not inherit another role's process as fact. Historical interview reviews are risk evidence only.
+
+Apply [hiring assessment policy](hiring-assessment-policy.md) for separate test/assignment/live-coding/reference evidence. `NOT_LISTED` is not `EXPLICIT_NONE`. The profile's effort maximum and any assessment exclusions are decision gates before ranking.
 
 ## Two-stage decision
 

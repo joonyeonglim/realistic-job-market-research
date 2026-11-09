@@ -1,9 +1,9 @@
 interface:
-  display_name: "Realistic Job Market Research"
-  short_description: "Audit public job postings and rank evidence-backed opportunities"
+  display_name: "지원할 만한 일자리 찾기"
+  short_description: "기존 경력과 조건으로 지원할 곳을 찾고 확인할 점을 정리합니다"
   icon_small: "./assets/icon-small.svg"
   icon_large: "./assets/icon-large.png"
   brand_color: "#087F6B"
-  default_prompt: "Use $realistic-job-market-research to collect or review current openings against my local profile and produce an audited, evidence-backed shortlist."
+  default_prompt: "$realistic-job-market-research 나 지원할 만한 데 찾아줘. 기존 경력과 조건을 참고해서 우선 볼 곳 3개만 알려줘."
 policy:
   allow_implicit_invocation: true
